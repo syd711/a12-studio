@@ -4,12 +4,16 @@ import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.RootController;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.events.StudioEventListener;
+import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -79,7 +83,26 @@ public final class FxTestSupport {
     rootController.set(null, new NoSelectionRootController());
   }
 
+  // Controllers loaded through load() register themselves with the application-wide StudioEventManager and would
+  // otherwise keep reacting to events fired by later tests (against whatever Studio state those tests set up).
+  private static final List<Object> loadedControllers = new ArrayList<>();
+
+  /**
+   * Unregisters every controller loaded through {@link #load} so far from the {@link StudioEventManager}. Runs
+   * on each {@link #startToolkit()} (a test class's {@code @BeforeAll}) and before each {@link #load}, so a test
+   * never sees editors leaked by an earlier one.
+   */
+  public static synchronized void releaseLoadedControllers() {
+    for (Object controller : loadedControllers) {
+      if (controller instanceof StudioEventListener listener) {
+        StudioEventManager.getInstance().removeListener(listener);
+      }
+    }
+    loadedControllers.clear();
+  }
+
   public static synchronized boolean startToolkit() throws Exception {
+    releaseLoadedControllers();
     if (toolkitAvailable != null) {
       return toolkitAvailable;
     }
@@ -143,11 +166,15 @@ public final class FxTestSupport {
     if (location == null) {
       throw new AssertionError("Missing FXML " + absoluteResourcePath);
     }
+    releaseLoadedControllers();
     return onFx(() -> {
       FXMLLoader loader = new FXMLLoader(location, StudioBundle.getBundle());
       Object root = loader.load();
       @SuppressWarnings("unchecked")
       T controller = (T) loader.getController();
+      synchronized (FxTestSupport.class) {
+        loadedControllers.add(controller);
+      }
       return new Loaded<>(controller, root);
     });
   }

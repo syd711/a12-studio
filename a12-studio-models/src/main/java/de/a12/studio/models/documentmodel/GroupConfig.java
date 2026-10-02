@@ -27,6 +27,10 @@ public class GroupConfig {
   private String indexFieldName;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private IncludeConfig includeConfig;
+  // Composed Document Models written by SME mark their includes with an alias into the header's
+  // modelReferences (purpose "include") instead of an includeConfig. Round-trip plus lookup.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String modelAlias;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Element> elements = new ArrayList<>();
 

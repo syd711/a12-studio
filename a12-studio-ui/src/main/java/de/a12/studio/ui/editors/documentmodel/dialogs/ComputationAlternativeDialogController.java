@@ -5,6 +5,9 @@ import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.rulelang.RuleLanguageSyntaxChecker;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.kernel.ComputationKernelCheck;
+import de.a12.studio.modelsvalidation.kernel.ComputationKernelCheck.TextPart;
+import de.a12.studio.modelsvalidation.kernel.RuleConditionKernelCheck;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
@@ -19,6 +22,7 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -57,6 +61,7 @@ public class ComputationAlternativeDialogController implements DialogController 
 
   @FXML
   private void initialize() {
+    RuleConditionKernelCheck.warmUpAsync();
     preconditionController.configureCustom("precondition", StudioBundle.get("precondition"));
     preconditionController.setSaveMode(saveMode);
     preconditionController.setValidator(RuleLanguageSyntaxChecker::validate);
@@ -73,10 +78,17 @@ public class ComputationAlternativeDialogController implements DialogController 
     this.originalPrecondition = alternative.getPrecondition();
     this.originalOperation = alternative.getOperation();
 
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    // An alternative being added is not in the list yet; it will be appended, i.e. get index size().
+    List<ComputationAlternative> alternatives = computation.getComputation().getComputationAlternatives();
+    int index = alternatives.contains(alternative) ? alternatives.indexOf(alternative) : alternatives.size();
+    ComputationKernelCheck kernelCheck = projectItem != null && projectItem.getModel() instanceof DocumentModel model
+        ? new ComputationKernelCheck(projectItem, model.getId(), computation.getId()) : null;
+    preconditionController.setValidator(text -> kernelValidated(text, kernelCheck, TextPart.PRECONDITION, index));
+    operationController.setValidator(text -> kernelValidated(text, kernelCheck, TextPart.OPERATION, index));
     preconditionController.setCustom(alternative::getPrecondition, alternative::setPrecondition);
     operationController.setCustom(alternative::getOperation, alternative::setOperation);
 
-    ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null && projectItem.getModel() instanceof DocumentModel documentModel) {
       PlainPathSuggestionProvider suggestionProvider = new PlainPathSuggestionProvider(new ElementIndex(documentModel), computation);
       preconditionController.setSuggestionProvider(suggestionProvider);
@@ -85,6 +97,12 @@ public class ComputationAlternativeDialogController implements DialogController 
       operationController.setHighlightedFunctionNames(RuleLanguageConstructs.NAMES);
     }
     updateOkButton();
+  }
+
+  /** Grammar check first (instant), then the kernel for what only the model can tell. */
+  private static String kernelValidated(String text, ComputationKernelCheck kernelCheck, TextPart part, int index) {
+    String syntaxError = RuleLanguageSyntaxChecker.validate(text);
+    return syntaxError != null || kernelCheck == null ? syntaxError : kernelCheck.check(part, index, text);
   }
 
   private void updateOkButton() {

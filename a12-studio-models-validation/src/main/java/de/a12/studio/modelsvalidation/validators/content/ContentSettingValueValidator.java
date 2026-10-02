@@ -20,8 +20,9 @@ import java.util.regex.Pattern;
  * The rest of gap 9 of "Content Model: gap review": SME's length/spacing/numeric property controllers reject a
  * value their converter cannot parse ({@code Invalid setting for property "..."}); {@link ContentSettingsValidator}
  * already covers the required/URL/image-source settings, this covers the CSS length/spacing and whole-number
- * ones, per {@link ContentPropertyFormatRules}. Color and shadow settings are deliberately not covered - see
- * that class's javadoc.
+ * ones, per {@link ContentPropertyFormatRules}, and the color/shadow settings, ported from the editor's
+ * controllers. SME itself only reports a shadow's unreadable offset/blur/spread numbers; a malformed color or
+ * shadow shape makes its converter throw, so those are reported here too.
  * <p>
  * A settings row is checked whenever its path is present in the element's props, regardless of whether the row
  * editing it would currently be shown/enabled ({@code showWhen}/{@code enabledWhen} in the FXML) - SME's own
@@ -29,6 +30,8 @@ import java.util.regex.Pattern;
  */
 public final class ContentSettingValueValidator implements ModelValidator {
 
+  /** What JS {@code parseFloat} accepts as a prefix (anything else is NaN, i.e. "Invalid number input"). */
+  private static final Pattern PARSE_FLOAT = Pattern.compile("^[+-]?(?:\\d+\\.?\\d*|\\.\\d+|Infinity)");
   private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
   @Override
@@ -63,7 +66,24 @@ public final class ContentSettingValueValidator implements ModelValidator {
       case NUMBER -> isValidNumber(raw);
       case LENGTH -> raw instanceof String text && isValidLength(rule, text);
       case SPACING -> raw instanceof String text && isValidSpacing(rule, text);
+      case COLOR -> raw instanceof String text && CssColor.isValid(text);
+      case SHADOW -> raw instanceof String text && isValidShadow(text);
     };
+  }
+
+  /** Mirrors {@code createShadowController().converter}: 5 tokens, or 6 with a leading style word. */
+  private static boolean isValidShadow(String text) {
+    String[] elements = text.replaceAll("\\s+", " ").replaceAll(",\\s+", ",").split(" ", -1);
+    if (elements.length != 5 && elements.length != 6) {
+      return false;
+    }
+    int first = elements.length == 6 ? 1 : 0;
+    for (int i = first; i < first + 4; i++) {
+      if (!PARSE_FLOAT.matcher(elements[i]).find()) {
+        return false;
+      }
+    }
+    return CssColor.isValid(elements[first + 4]);
   }
 
   private static boolean isValidNumber(Object raw) {

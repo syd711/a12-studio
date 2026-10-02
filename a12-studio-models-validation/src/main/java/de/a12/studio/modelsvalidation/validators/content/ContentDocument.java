@@ -1,6 +1,6 @@
 package de.a12.studio.modelsvalidation.validators.content;
 
-import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
+import de.a12.studio.modelsvalidation.kernel.ProjectKernelModels;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.modelsvalidation.ValidationContext;
@@ -32,7 +32,7 @@ record ContentDocument(@Nullable String documentModelId, @Nullable DocumentModel
     if (documentModelId != null) {
       documentModel = context.findOtherDocumentModel(documentModelId);
       if (documentModel == null && context.projectItem() != null) {
-        documentModel = CombinedDocumentModelElements.resolveForFieldReferences(context.projectItem(), documentModelId);
+        documentModel = ProjectKernelModels.resolveForFieldReferences(context.projectItem(), documentModelId);
       }
     }
     DocumentStructure structure = documentModel != null ? new DocumentStructure(documentModel, context.otherDocumentModels()) : null;

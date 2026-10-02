@@ -145,7 +145,7 @@ public final class RuleConditionKernelCheck {
     return model;
   }
 
-  private static @Nullable JsonNode find(JsonNode elements, String id) {
+  static @Nullable JsonNode find(JsonNode elements, String id) {
     for (JsonNode element : elements) {
       if (id.equals(element.path("id").asString())) {
         return element;

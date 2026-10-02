@@ -1,0 +1,45 @@
+{
+  "header": {
+    "id": "PersonOverwrite_Cm",
+    "modelType": "combination",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "purpose": "combination-base",
+        "reference": "Person_Dc"
+      },
+      {
+        "modelType": "additive-document",
+        "purpose": "combination-addition",
+        "reference": "PersonOverwrite_Ad"
+      }
+    ]
+  },
+  "content": {
+    "baseModelId": "Person_Dc",
+    "CombinationSteps": [
+      {
+        "type": "Addition",
+        "AdditiveModel": {
+          "dmId": "PersonOverwrite_Ad"
+        }
+      }
+    ]
+  }
+}

@@ -2,7 +2,7 @@ package de.a12.studio.ui.util;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
-import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
+import de.a12.studio.modelsvalidation.kernel.ProjectKernelModels;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModelHeterogeneity;
 import de.a12.studio.models.projects.Project;
@@ -32,7 +32,7 @@ public final class ProjectDocumentModels {
 
   /**
    * {@link #getOtherDocumentModels}, plus for every Combination Model of the project the synthetic Document Model
-   * that stands in for it (see {@link CombinedDocumentModelElements}; it carries the combination's own id, so a
+   * that stands in for it (see {@link de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements}; it carries the combination's own id, so a
    * reference to the combination resolves to it). For whoever has to follow a Document Model reference that may
    * name a combination - e.g. the Document Model of a Form Model bound to one.
    */
@@ -145,7 +145,7 @@ public final class ProjectDocumentModels {
    * (e.g. an Overview Model's {@code document-model-for-overview} reference pointing at a {@code
    * PersonEmployee_Cm}-shaped combined document, see {@code PersonEmployee_Ov.json}) - a synthetic merge of
    * that Combination Model's base Document Model and every {@code Addition} step's additive model (see
-   * {@link CombinedDocumentModelElements}). Resolved from the project's canonical root ({@link
+   * {@link de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements}). Resolved from the project's canonical root ({@link
    * Studio#getCurrentProject()}, see {@link #getOtherDocumentModels} for why), not {@code modelId}'s own
    * parent chain. {@code null} if {@code modelId} is {@code null}, no project is open, {@code modelId}
    * doesn't resolve to any model in the project, or resolves to something that's neither.
@@ -155,7 +155,7 @@ public final class ProjectDocumentModels {
     if (project == null || modelId == null) {
       return null;
     }
-    return CombinedDocumentModelElements.resolveForFieldReferences(project.getRoot(), modelId);
+    return ProjectKernelModels.resolveForFieldReferences(project.getRoot(), modelId);
   }
 
   /**

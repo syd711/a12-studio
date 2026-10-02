@@ -112,6 +112,38 @@ class ContentSettingValueValidatorTest {
   }
 
   @Test
+  void colorsAcceptWhatColorStringUnderstandsAndRejectTheRest() {
+    List<String> valid = List.of("", "#333333", "#333", "#3334", "#33333380", "#ABCDEF", "rgb(107, 107, 134)",
+        "rgb(0, 0, 0, 1)", "rgba(0,0,0,0.5)", "rgb(0 0 0 / 50%)", "rgb(10%, 20%, 30%)", "hsl(120, 50%, 50%)",
+        "hwb(120, 10%, 10%)", "red", "transparent");
+    List<String> invalid = List.of("#33", "#3333333", "Red", "notacolor", "RGB(1,2,3)", "rgb(1, 2)", "rgb(a, b, c)",
+        "hsl(120, 50, 50)");
+    for (String color : valid) {
+      assertEquals(List.of(), run(page(null, element("box", "Box", "style", map("color", color)))), color);
+    }
+    for (String color : invalid) {
+      assertEquals(1, run(page(null, element("box", "Box", "style", map("backgroundColor", color)))).size(), color);
+    }
+    assertEquals(1, run(page(null, element("box", "Box", "style", map("borderColor", "nope")))).size());
+    // Paragraph has no color controller.
+    assertEquals(List.of(), run(page(null, element("p", "Paragraph", "style", map("color", "nope")))));
+  }
+
+  @Test
+  void boxShadowNeedsFiveOrSixTokensWithReadableNumbersAndAColor() {
+    List<String> valid = List.of("0px 2px 4px 0px rgb(0, 0, 0, 1)", "inset 0px 2px 4px 1px #333333",
+        "0px 2px 4px 0px rgba(0,0,0,0.5)", "1px 1px 1px 1px red");
+    List<String> invalid = List.of("0px 2px 4px rgb(0, 0, 0, 1)", "0px 2px 4px 0px", "a 2px 4px 0px red",
+        "0px 2px 4px 0px nocolor", "inset 0px 2px 4px 0px rgb(0, 0, 0) extra");
+    for (String shadow : valid) {
+      assertEquals(List.of(), run(page(null, element("box", "Box", "style", map("boxShadow", shadow)))), shadow);
+    }
+    for (String shadow : invalid) {
+      assertEquals(1, run(page(null, element("img", "Image", "style", map("boxShadow", shadow)))).size(), shadow);
+    }
+  }
+
+  @Test
   void everyValidatorIgnoresModelsThatAreNotContentModels() {
     de.a12.studio.models.formmodel.FormModel form = new de.a12.studio.models.formmodel.FormModel();
     form.setId("Order_FM");

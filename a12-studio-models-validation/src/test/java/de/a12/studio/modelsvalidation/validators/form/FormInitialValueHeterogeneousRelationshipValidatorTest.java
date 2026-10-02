@@ -154,12 +154,12 @@ class FormInitialValueHeterogeneousRelationshipValidatorTest {
   @Test
   void reportsAnInitialValueBehindAHeterogeneousRelationship() {
     DocumentModel special = documentModel("SpecialPosition_DM", "Position_DM");
-    assertEquals(1, validate(formModel("field_Position_DM", null), 1, special).size());
+    assertEquals(1, validate(formModel("include1_field_Position_DM", null), 1, special).size());
   }
 
   @Test
   void acceptsAnInitialValueBehindAHomogeneousRelationship() {
-    assertEquals(List.of(), validate(formModel("field_Position_DM", null), 1));
+    assertEquals(List.of(), validate(formModel("include1_field_Position_DM", null), 1));
   }
 
   @Test
@@ -171,6 +171,6 @@ class FormInitialValueHeterogeneousRelationshipValidatorTest {
   @Test
   void reportsAnIndexedControlBehindAHeterogeneousRelationshipOnlyOnce() {
     DocumentModel special = documentModel("SpecialPosition_DM", "Position_DM");
-    assertEquals(1, validate(formModel("field_Position_DM", "1"), 3, special).size());
+    assertEquals(1, validate(formModel("include1_field_Position_DM", "1"), 3, special).size());
   }
 }

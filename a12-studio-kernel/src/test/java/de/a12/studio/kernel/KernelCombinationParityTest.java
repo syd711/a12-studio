@@ -17,16 +17,23 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
- * Pins the whole Combination Model expansion (Addition, Selection and Decoration steps) as SME shows it. The golden
+ * Pins the whole Combination Model expansion (Addition, Selection and Decoration steps, several steps in one combination) as SME shows it. The golden
  * files are the output of the installed SME 13.0.2 backend ({@code POST /api/combination-model/expand}, recorded
  * 2026-10-02); the kernel facade must reproduce it exactly - elements, order, ids, every property, type
  * definitions, header and the joining warnings. Two SME-only additions are stripped from the golden files: the
  * {@code __meta} group and {@code header.modelReferences} (SME's own metadata enrichment, not the kernel).
  *
- * <p>{@code PersonSkills_Selection_Cm} is a Selection-only variant of the workspace's decoration combination; it lives
+ * <p>{@code PersonSkills_Selection_Cm} (a Selection-only variant of the workspace's decoration combination) and
+ * {@code PersonEmployeeFreelancer_Cm} (the Employee and the Freelancer addition in one combination) and
+ * {@code PersonOverwrite_Cm} (an additive model that redefines the reference field {@code FirstName} with another label; SME and the kernel both
+ * keep the reference's definition) live
  * in the test resources because {@code testing/workspaces} is also the round-trip fixture set.
  */
 class KernelCombinationParityTest {
+
+  /** Combinations that live in the test resources instead of {@code testing/workspaces}. */
+  private static final List<String> FIXTURES = List.of("PersonSkills_Selection_Cm", "PersonEmployeeFreelancer_Cm",
+      "PersonOverwrite_Cm", "PersonOverwrite_Ad");
 
   private static final ObjectMapper MAPPER = JsonMapper.builder().build();
 
@@ -35,13 +42,14 @@ class KernelCombinationParityTest {
       "PersonEmployee_Cm",           // Addition
       "PersonFreelancer_Cm",         // Addition
       "PersonSkills_Selection_Cm",   // Selection
-      "PersonSkills_LinkFields_Cm"   // DecorationForFields (selection + decoration model)
+      "PersonSkills_LinkFields_Cm",  // DecorationForFields (selection + decoration model)
+      "PersonEmployeeFreelancer_Cm", // two Addition steps in one combination
+      "PersonOverwrite_Cm"           // an additive model that redefines a reference field
   })
   void kernelExpansionMatchesSme(String combinationId) throws IOException {
     JsonNode golden = resource("/sme-combination-golden/" + combinationId + ".json");
     KernelModelSource workspace = TestWorkspaces.source("advanced_new");
-    KernelModelSource source = id -> id.equals("PersonSkills_Selection_Cm")
-        ? text("/combination-fixtures/PersonSkills_Selection_Cm.json") : workspace.load(id);
+    KernelModelSource source = id -> FIXTURES.contains(id) ? text("/combination-fixtures/" + id + ".json") : workspace.load(id);
 
     KernelExpansion expansion = new KernelDocumentModelExpander().expand(combinationId, source);
 

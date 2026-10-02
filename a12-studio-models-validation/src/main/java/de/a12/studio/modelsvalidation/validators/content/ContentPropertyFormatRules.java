@@ -14,12 +14,8 @@ import java.util.Set;
  * numeric/length/spacing controllers report {@code Invalid setting for property "..."} when a stored value fails
  * their converter; this table is the model-layer half of the same check.
  * <p>
- * Deliberately not covered: {@code ColorRow} and {@code ShadowRow} settings. Both accept the full breadth of
- * CSS color/shadow syntax that SME's own {@code Color.web}-equivalent parser understands (hex, named colors,
- * {@code rgb()}/{@code rgba()}/{@code hsl()}, multi-layer shadows); cloning that grammar accurately enough to
- * avoid false positives on legitimately valid real files needs the same "read it out of the installed bundle,
- * don't guess" treatment the rest of this gap review used - left open rather than attempted with an
- * under-specified port.
+ * Color and shadow settings follow the Content Engine editor's own controllers ({@code color-controller.ts},
+ * {@code shadow-controller.ts} of {@code contentengine-editor}, see {@link CssColor}), which have no format table.
  */
 final class ContentPropertyFormatRules {
 
@@ -31,7 +27,11 @@ final class ContentPropertyFormatRules {
      * Radius) - mirrors {@code SpacingRow}. */
     SPACING,
     /** A whole number (SME's numeric input, e.g. a date picker year) - mirrors {@code NumberRow}. */
-    NUMBER
+    NUMBER,
+    /** A color {@link CssColor} understands, or empty - mirrors the editor's color controller. */
+    COLOR,
+    /** {@code [inset] offsetX offsetY blur spread color} - mirrors the editor's shadow controller. */
+    SHADOW
   }
 
   record Rule(Set<String> types, String path, Kind kind, List<String> keywords, List<String> units) {
@@ -52,6 +52,14 @@ final class ContentPropertyFormatRules {
 
   private static Rule number(String types, String path) {
     return new Rule(typeSet(types), path, Kind.NUMBER, List.of(), List.of());
+  }
+
+  private static Rule color(String types, String path) {
+    return new Rule(typeSet(types), path, Kind.COLOR, List.of(), List.of());
+  }
+
+  private static Rule shadow(String types, String path) {
+    return new Rule(typeSet(types), path, Kind.SHADOW, List.of(), List.of());
   }
 
   private static Set<String> typeSet(String types) {
@@ -82,6 +90,15 @@ final class ContentPropertyFormatRules {
       // border-panel.fxml
       length("Box,ListItem,OrderedList,UnorderedList,Image,Button,ButtonGroup", "style.borderWidth"),
       spacing("Box,ListItem,OrderedList,UnorderedList,Image,Button,ButtonGroup", "style.borderRadius"),
+
+      color("Box,ListItem,OrderedList,UnorderedList,Image,Button,ButtonGroup", "style.borderColor"),
+
+      // color-panel.fxml
+      color("Box,MessageBox", "style.color"),
+      color("Box,MessageBox", "style.backgroundColor"),
+
+      // shadow-panel.fxml
+      shadow("Box,Image", "style.boxShadow"),
 
       // icons-panel.fxml
       length("Expandable", "icons.size"),

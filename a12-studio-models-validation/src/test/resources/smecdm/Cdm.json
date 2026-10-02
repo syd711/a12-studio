@@ -1,0 +1,287 @@
+{
+  "header": {
+    "id": "Cdm",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "cdm.queryRoot",
+        "value": "A_DM"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "A_DM",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "A_DM"
+      },
+      {
+        "alias": "B_DM",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "B_DM"
+      },
+      {
+        "alias": "C_DM",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "C_DM"
+      },
+      {
+        "alias": "LinkedDM",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "LinkedDM"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Cdm",
+      "immutable": false,
+      "joinedModelsInfo": "Cdm-document-meta-data+Add"
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "include_e5d3b",
+          "name": "A_root",
+          "Group": {
+            "repeatability": 1,
+            "modelAlias": "A_DM"
+          }
+        },
+        {
+          "type": "Group",
+          "id": "group_55abb",
+          "name": "A_B",
+          "annotations": [
+            {
+              "name": "cdm.relationship",
+              "value": "A_B"
+            },
+            {
+              "name": "cdm.sourceRole",
+              "value": "parent"
+            },
+            {
+              "name": "cdm.targetRole",
+              "value": "child"
+            },
+            {
+              "name": "cdm.targetDocumentModel",
+              "value": "B_DM"
+            }
+          ],
+          "externalDescription": [
+            {
+              "locale": "en",
+              "text": "external description"
+            }
+          ],
+          "internalDescription": [
+            {
+              "locale": "en",
+              "text": "internal description"
+            }
+          ],
+          "Group": {
+            "repeatability": 1000000,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_a55cc",
+                "name": "B_root",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "B_DM"
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_4cf7e",
+                "name": "B_C",
+                "annotations": [
+                  {
+                    "name": "cdm.relationship",
+                    "value": "B_C"
+                  },
+                  {
+                    "name": "cdm.sourceRole",
+                    "value": "parent"
+                  },
+                  {
+                    "name": "cdm.targetRole",
+                    "value": "child"
+                  },
+                  {
+                    "name": "cdm.targetDocumentModel",
+                    "value": "C_DM"
+                  }
+                ],
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Group",
+                      "id": "include_4b01b",
+                      "name": "C_root",
+                      "Group": {
+                        "repeatability": 1,
+                        "modelAlias": "C_DM"
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_9d363",
+                      "name": "relationship",
+                      "Group": {
+                        "repeatability": 1,
+                        "elements": [
+                          {
+                            "type": "Group",
+                            "id": "include_f8e1c",
+                            "name": "Linked_root",
+                            "Group": {
+                              "repeatability": 1,
+                              "modelAlias": "LinkedDM"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "Group",
+          "id": "group_1252c",
+          "name": "A_C",
+          "annotations": [
+            {
+              "name": "cdm.relationship",
+              "value": "A_C"
+            },
+            {
+              "name": "cdm.sourceRole",
+              "value": "parnet"
+            },
+            {
+              "name": "cdm.targetRole",
+              "value": "child"
+            },
+            {
+              "name": "cdm.targetDocumentModel",
+              "value": "C_DM"
+            }
+          ],
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_0f4d9",
+                "name": "C_root",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "C_DM"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "Group",
+          "id": "group_1c535",
+          "name": "A_A",
+          "annotations": [
+            {
+              "name": "cdm.relationship",
+              "value": "A_A"
+            },
+            {
+              "name": "cdm.sourceRole",
+              "value": "parent_1"
+            },
+            {
+              "name": "cdm.targetRole",
+              "value": "child_n"
+            },
+            {
+              "name": "cdm.targetDocumentModel",
+              "value": "A_DM"
+            }
+          ],
+          "Group": {
+            "repeatability": 999999999,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_76b40",
+                "name": "A_root",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "A_DM"
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_d5741",
+                "name": "A_C",
+                "annotations": [
+                  {
+                    "name": "cdm.relationship",
+                    "value": "A_C"
+                  },
+                  {
+                    "name": "cdm.sourceRole",
+                    "value": "parnet"
+                  },
+                  {
+                    "name": "cdm.targetRole",
+                    "value": "child"
+                  },
+                  {
+                    "name": "cdm.targetDocumentModel",
+                    "value": "C_DM"
+                  }
+                ],
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Group",
+                      "id": "include_390a6",
+                      "name": "C_root",
+                      "Group": {
+                        "repeatability": 1,
+                        "modelAlias": "C_DM"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,183 @@
+{
+  "header": {
+    "id": "Cdm_heterogeneity_no_selectable_rels",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "cdm.queryRoot",
+        "value": "A_grandchild_DM"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "A_grandchild_DM",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "A_grandchild_DM"
+      },
+      {
+        "alias": "A_child_DM",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "A_child_DM"
+      },
+      {
+        "alias": "B_DM",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "B_DM"
+      },
+      {
+        "alias": "A_DM",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "A_DM"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Cdm_heterogeneity_no_selectable_rels",
+      "immutable": false,
+      "joinedModelsInfo": "Cdm_heterogeneity_no_selectable_rels-document-meta-data+Add"
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "include_203c5",
+          "name": "A_grandchild_root",
+          "Group": {
+            "repeatability": 1,
+            "modelAlias": "A_grandchild_DM"
+          }
+        },
+        {
+          "type": "Group",
+          "id": "group_b6570",
+          "name": "A_A_child_role_child",
+          "annotations": [
+            {
+              "name": "cdm.relationship",
+              "value": "A_A_child"
+            },
+            {
+              "name": "cdm.sourceRole",
+              "value": "role_parent"
+            },
+            {
+              "name": "cdm.targetRole",
+              "value": "role_child"
+            },
+            {
+              "name": "cdm.targetDocumentModel",
+              "value": "A_child_DM"
+            }
+          ],
+          "Group": {
+            "repeatability": 999999999,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_cdb5c",
+                "name": "A_child_root",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "A_child_DM"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "Group",
+          "id": "group_b8705",
+          "name": "A_B",
+          "annotations": [
+            {
+              "name": "cdm.relationship",
+              "value": "A_B"
+            },
+            {
+              "name": "cdm.sourceRole",
+              "value": "parent"
+            },
+            {
+              "name": "cdm.targetRole",
+              "value": "child"
+            },
+            {
+              "name": "cdm.targetDocumentModel",
+              "value": "B_DM"
+            }
+          ],
+          "Group": {
+            "repeatability": 1000000,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_8a669",
+                "name": "B_root",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "B_DM"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "Group",
+          "id": "group_9b4c0",
+          "name": "A_A_child_role_parent",
+          "annotations": [
+            {
+              "name": "cdm.relationship",
+              "value": "A_A_child"
+            },
+            {
+              "name": "cdm.sourceRole",
+              "value": "role_child"
+            },
+            {
+              "name": "cdm.targetRole",
+              "value": "role_parent"
+            },
+            {
+              "name": "cdm.targetDocumentModel",
+              "value": "A_DM"
+            }
+          ],
+          "Group": {
+            "repeatability": 999999999,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_4d908",
+                "name": "A_root",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "A_DM"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

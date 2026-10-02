@@ -1,0 +1,75 @@
+{
+  "header": {
+    "id": "A_A_child",
+    "modelType": "relationship",
+    "modelVersion": "3.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "role_parent",
+        "reference": "A_DM"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "role_child",
+        "reference": "A_child_DM"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "associationType": "SHARED",
+    "storage": "EXTERNAL",
+    "labels": [
+      {
+        "locale": "en"
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "documentModel": "A_DM",
+        "linkConstraints": {
+          "multiplicity": {
+            "lowerLimit": 0,
+            "unbounded": true,
+            "upperLimit": null
+          }
+        },
+        "ordered": false,
+        "navigable": true,
+        "labels": [
+          {
+            "locale": "en"
+          }
+        ],
+        "role": "role_parent"
+      },
+      {
+        "documentModel": "A_child_DM",
+        "linkConstraints": {
+          "multiplicity": {
+            "lowerLimit": 0,
+            "unbounded": true,
+            "upperLimit": null
+          }
+        },
+        "ordered": false,
+        "navigable": true,
+        "labels": [
+          {
+            "locale": "en"
+          }
+        ],
+        "role": "role_child"
+      }
+    ]
+  }
+}

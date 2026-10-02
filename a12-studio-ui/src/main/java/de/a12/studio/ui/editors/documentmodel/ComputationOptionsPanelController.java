@@ -6,6 +6,9 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.rulelang.RuleLanguageSyntaxChecker;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.kernel.ComputationKernelCheck;
+import de.a12.studio.modelsvalidation.kernel.ComputationKernelCheck.TextPart;
+import de.a12.studio.modelsvalidation.kernel.RuleConditionKernelCheck;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -49,6 +52,8 @@ public class ComputationOptionsPanelController extends AbstractPropertyEditor im
     super.initialize(location, resources);
 
     commonPreconditionController.configureCustom("commonPrecondition", "");
+    // Loads the kernel in the background so the first check is not slowed down by it.
+    RuleConditionKernelCheck.warmUpAsync();
     commonPreconditionController.setValidator(RuleLanguageSyntaxChecker::validate);
 
     bindCheckBox(allowDifferingDecimalPlacesCheckBox, (element, value) -> {
@@ -74,10 +79,18 @@ public class ComputationOptionsPanelController extends AbstractPropertyEditor im
     ComputationConfig computation = getComputation(element);
     setFieldValue(allowDifferingDecimalPlacesCheckBox, computation.getErrorCodesToSuppress().contains(DIFFERING_DECIMAL_PLACES_ERROR_CODE));
     setFieldValue(commonPreconditionCheckBox, computation.getCommonPrecondition() != null);
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    // Grammar first, then the kernel for what only the model can tell. Before setCustom, which validates the initial text.
+    ComputationKernelCheck kernelCheck = projectItem != null && projectItem.getModel() instanceof DocumentModel model
+        ? new ComputationKernelCheck(projectItem, model.getId(), element.getId()) : null;
+    commonPreconditionController.setValidator(text -> {
+      String syntaxError = RuleLanguageSyntaxChecker.validate(text);
+      return syntaxError != null || kernelCheck == null ? syntaxError
+          : kernelCheck.check(TextPart.COMMON_PRECONDITION, 0, text);
+    });
     commonPreconditionController.setCustom(computation::getCommonPrecondition, computation::setCommonPrecondition);
     updateCommonPreconditionVisibility();
 
-    ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null && projectItem.getModel() instanceof DocumentModel documentModel) {
       commonPreconditionController.setSuggestionProvider(new PlainPathSuggestionProvider(new ElementIndex(documentModel), element));
       commonPreconditionController.setHighlightedFunctionNames(RuleLanguageConstructs.NAMES);

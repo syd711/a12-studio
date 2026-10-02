@@ -4,6 +4,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
+import de.a12.studio.modelsvalidation.kernel.KernelConditionValidator;
 import de.a12.studio.modelsvalidation.validators.AnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.AttachmentGroupValidator;
 import de.a12.studio.modelsvalidation.validators.BasicConsistencyValidator;
@@ -77,6 +78,7 @@ public final class DocumentModelValidationService {
       new IncludeStructureValidator(),
       new SupportedCharactersValidator(),
       new RuleConditionSyntaxValidator(),
+      new KernelConditionValidator(),
       new CdmQueryRootReferenceValidator(),
       new CdmRelationshipStepValidator(),
       new ContentUniquenessCriteriaValidator()));

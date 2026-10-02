@@ -135,7 +135,7 @@ class FormEnginePreviewTest {
   void aFreshFormModelIsPreviewedWithTheBoxesTheFormEngineRequires() throws Exception {
     assumeTrue(smeAvailable, "No Simple Model Editor in the A12 installation");
     Project project = loadWorkspace("basic");
-    ProjectItem fresh = NewModelFactory.createModel(project.getRoot(), ModelType.FORM, "Fresh_FM", "Invoice_DM", true);
+    ProjectItem fresh = NewModelFactory.createModel(project.getRoot(), ModelType.FORM, "Fresh_FM", "Invoice_DM", false);
     assertFalse(Files.readString(Path.of(fresh.getPath())).contains("subHeaderBox"), "a new Form Model does not store them");
 
     String formModel = new FormModelPreviewSession(fresh).snapshot(null, null).formModel();

@@ -1,0 +1,101 @@
+{
+  "header": {
+    "id": "Cdm_invalid_RelationshipRepetitions",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "cdm.queryRoot",
+        "value": "A_DM"
+      },
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "A_DM",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "A_DM"
+      },
+      {
+        "alias": "B_DM",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "B_DM"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Cdm_invalid_RelationshipRepetitions",
+      "immutable": false,
+      "joinedModelsInfo": "Cdm_invalid_RelationshipRepetitions-document-meta-data+Add"
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "include_e0852",
+          "name": "A_root",
+          "Group": {
+            "repeatability": 1,
+            "modelAlias": "A_DM"
+          }
+        },
+        {
+          "type": "Group",
+          "id": "group_2bb3d",
+          "name": "A_B",
+          "annotations": [
+            {
+              "name": "cdm.relationship",
+              "value": "A_B"
+            },
+            {
+              "name": "cdm.sourceRole",
+              "value": "parent"
+            },
+            {
+              "name": "cdm.targetRole",
+              "value": "child"
+            },
+            {
+              "name": "cdm.targetDocumentModel",
+              "value": "B_DM"
+            }
+          ],
+          "Group": {
+            "repeatability": 2000000,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_2567a",
+                "name": "B_root",
+                "Group": {
+                  "repeatability": 1,
+                  "modelAlias": "B_DM"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

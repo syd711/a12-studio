@@ -2,6 +2,7 @@ package de.a12.studio.modelsvalidation.validators.form;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Annotation;
+import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.composeddocumentmodel.ComposedDocumentModel;
 import de.a12.studio.models.composeddocumentmodel.ComposedDocumentModelResolver;
 import de.a12.studio.models.documentmodel.DocumentModel;
@@ -90,7 +91,7 @@ public final class FormInitialValueHeterogeneousRelationshipValidator implements
       return null;
     }
     for (GroupElement root : model.getContent().getModelRoot().getRootGroups()) {
-      List<Node> path = findIn(root, elementId, context, new ArrayList<>());
+      List<Node> path = findIn(root, elementId, context, new ArrayList<>(), model);
       if (path != null) {
         return path;
       }
@@ -98,28 +99,29 @@ public final class FormInitialValueHeterogeneousRelationshipValidator implements
     return null;
   }
 
-  private static List<Node> findIn(Element element, String elementId, ValidationContext context, List<Node> ancestors) {
-    if (elementId.equals(element.getId())) {
+  private static List<Node> findIn(Element element, String elementId, ValidationContext context, List<Node> ancestors, DocumentModel cdm) {
+    if (elementId.equals(expandedPrefix(ancestors) + element.getId())) {
       return new ArrayList<>(ancestors);
     }
     if (!(element instanceof GroupElement groupElement) || groupElement.getGroup() == null || ancestors.size() > MAX_DEPTH) {
       return null;
     }
     GroupConfig group = groupElement.getGroup();
-    boolean include = group.getIncludeConfig() != null && group.getIncludeConfig().getReference() != null;
+    String includedId = includedModelId(group, cdm);
+    boolean include = includedId != null;
     boolean relationship = annotation(groupElement, ComposedDocumentModelResolver.RELATIONSHIP_ANNOTATION) != null;
     ancestors.add(new Node(groupElement, relationship, include));
     try {
       for (Element child : group.getElements()) {
-        List<Node> found = findIn(child, elementId, context, ancestors);
+        List<Node> found = findIn(child, elementId, context, ancestors, cdm);
         if (found != null) {
           return found;
         }
       }
-      if (include && context.findOtherDocumentModel(group.getIncludeConfig().getReference()) instanceof DocumentModel included
+      if (include && context.findOtherDocumentModel(includedId) instanceof DocumentModel included
           && included.getContent() != null && included.getContent().getModelRoot() != null) {
         for (GroupElement root : included.getContent().getModelRoot().getRootGroups()) {
-          List<Node> found = findIn(root, elementId, context, ancestors);
+          List<Node> found = findIn(root, elementId, context, ancestors, cdm);
           if (found != null) {
             return found;
           }
@@ -130,6 +132,32 @@ public final class FormInitialValueHeterogeneousRelationshipValidator implements
     finally {
       ancestors.remove(ancestors.size() - 1);
     }
+  }
+
+  // The kernel prefixes every element of an included model with the include group's id (nested includes chain), so
+  // a Form Model bound to a CDM references e.g. "include_725f7_field_bbe8f" and only its own fields unprefixed.
+  private static String expandedPrefix(List<Node> ancestors) {
+    StringBuilder prefix = new StringBuilder();
+    for (Node node : ancestors) {
+      if (node.include()) {
+        prefix.append(node.group().getId()).append('_');
+      }
+    }
+    return prefix.toString();
+  }
+
+  // The id of the model an include group points at: its includeConfig, or - as SME writes them into a CDM - its
+  // modelAlias resolved through the CDM's header modelReferences.
+  private static String includedModelId(GroupConfig group, DocumentModel cdm) {
+    if (group.getIncludeConfig() != null && group.getIncludeConfig().getReference() != null) {
+      return group.getIncludeConfig().getReference();
+    }
+    if (group.getModelAlias() == null || group.getModelAlias().isBlank()) {
+      return null;
+    }
+    return cdm.getModelReferences().stream()
+        .filter(reference -> group.getModelAlias().equals(reference.getAlias()))
+        .map(ModelReference::getReference).findFirst().orElse(group.getModelAlias());
   }
 
   // SME's isFieldOfCddDocument: no relationship group and no include on the path, or the last relationship group

@@ -3,7 +3,7 @@ package de.a12.studio.modelsvalidation.validators.overview;
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
-import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
+import de.a12.studio.modelsvalidation.kernel.ProjectKernelModels;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.EnumerationFieldType;
@@ -36,7 +36,7 @@ public final class OverviewElementResolution {
    * The Document Model this Overview Model's columns/filters resolve against: the one named by a header
    * {@code modelType: "document"} reference (following it through a Combination Model stand-in, e.g. {@code
    * PersonEmployee_Ov.json} -> {@code PersonEmployee_Cm}, via {@link
-   * CombinedDocumentModelElements#resolveForFieldReferences}), or - when there's no such reference at all, or
+   * ProjectKernelModels#resolveForFieldReferences}), or - when there's no such reference at all, or
    * it doesn't resolve - the target Document Model of the Query Model named by a {@link
    * ModelReference#PURPOSE_QUERY_MODEL_FOR_OVERVIEW} reference instead (a legitimate alternative binding, see
    * that constant's own doc; mirrors the Overview Model editor's own fallback, {@code
@@ -67,13 +67,13 @@ public final class OverviewElementResolution {
   }
 
   /** {@code documentModelId} resolved as a plain Document Model, or - if it names a Combination Model instead
-   * - the synthetic merge {@link CombinedDocumentModelElements#resolveForFieldReferences} makes of it. */
+   * - the synthetic merge {@link ProjectKernelModels#resolveForFieldReferences} makes of it. */
   public static DocumentModel resolveDocumentModelOrCombination(String documentModelId, ValidationContext context) {
     if (documentModelId == null) {
       return null;
     }
     DocumentModel direct = context.findOtherDocumentModel(documentModelId);
-    return direct != null ? direct : CombinedDocumentModelElements.resolveForFieldReferences(context.projectItem(), documentModelId);
+    return direct != null ? direct : ProjectKernelModels.resolveForFieldReferences(context.projectItem(), documentModelId);
   }
 
   /**

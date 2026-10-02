@@ -11,6 +11,8 @@ import de.a12.studio.kernel.KernelDocumentModelExpander;
 import de.a12.studio.kernel.KernelException;
 import de.a12.studio.kernel.KernelExpansion;
 import de.a12.studio.kernel.KernelModelSource;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
@@ -60,6 +62,25 @@ public final class ProjectKernelModels {
         return Optional.empty();
       }
     });
+  }
+
+  /**
+   * The Document Model to look element references up in: a plain Document Model as is, a Combination Model
+   * expanded by the kernel (Addition, Selection and Decoration steps), falling back to the approximate
+   * addition-only merge ({@link CombinedDocumentModelElements#resolveForFieldReferences}) when the kernel
+   * cannot expand it. {@code null} if the id resolves to neither.
+   */
+  public static DocumentModel resolveForFieldReferences(ProjectItem contextItem, String modelId) {
+    if (modelId != null) {
+      ProjectItem item = contextItem.findByModelId(modelId);
+      if (item != null && item.getModel() instanceof CombinedDocumentModel) {
+        Optional<DocumentModel> expanded = expand(contextItem, modelId);
+        if (expanded.isPresent()) {
+          return expanded.get();
+        }
+      }
+    }
+    return CombinedDocumentModelElements.resolveForFieldReferences(contextItem, modelId);
   }
 
   /** Like {@link #expand} but returns the expanded model as the kernel's JSON, for callers that hand it to the kernel again. */
