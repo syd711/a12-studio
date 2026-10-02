@@ -9,6 +9,8 @@ dependencies {
     // implementation, not api: no kernel type may leak into this module's public signatures.
     implementation 'com.mgmtp.a12.kernel:kernel-md-facade:31.1.1'
 
+    // Parsing the expanded model json in the parity tests; same version the kernel itself resolves to.
+    testImplementation 'tools.jackson.core:jackson-databind:3.2.1'
     testImplementation platform('org.junit:junit-bom:5.11.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

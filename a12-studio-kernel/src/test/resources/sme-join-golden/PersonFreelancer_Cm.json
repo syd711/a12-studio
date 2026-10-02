@@ -1,0 +1,375 @@
+{
+ "_comment": "Normalized result of the installed SME 13.0.2 backend POST /api/additive-model/join (reference Person_Dc, additive PersonFreelancer_Ad), recorded 2026-10-02. Element ids are omitted on purpose: SME restores the additive models original ids, the kernel prefixes them with md5(additive model id)_.",
+ "elements": [
+  {
+   "path": "/Person",
+   "type": "Group",
+   "props": {
+    "repeatability": 1
+   }
+  },
+  {
+   "path": "/Person/FirstName",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "First Name"
+     },
+     {
+      "locale": "de",
+      "text": "Vorname"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/LastName",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Last Name"
+     },
+     {
+      "locale": "de",
+      "text": "Nachname"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Type",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "EnumerationType",
+     "EnumerationType": {
+      "values": [
+       {
+        "value": "Employee",
+        "label": [
+         {
+          "locale": "en",
+          "text": "Employee"
+         },
+         {
+          "locale": "de",
+          "text": "Mitarbeiter"
+         }
+        ]
+       },
+       {
+        "value": "Freelancer",
+        "label": [
+         {
+          "locale": "en",
+          "text": "Freelancer"
+         },
+         {
+          "locale": "de",
+          "text": "Freiberufler"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Type"
+     },
+     {
+      "locale": "de",
+      "text": "Typ"
+     }
+    ],
+    "requirednessConfig": {
+     "mode": "absoluteOrRelativeToNextRepAncestor"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo",
+   "type": "Group",
+   "props": {
+    "repeatability": 1,
+    "usageType": "attachment"
+   }
+  },
+  {
+   "path": "/Person/Photo/original_filename",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/internal_filename",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/content",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType",
+     "StringType": {
+      "lineBreaksPermitted": true,
+      "noValueValidation": true
+     }
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/attachment_id",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/size",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "NumberType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/mime_type",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/category",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/description",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/AttachmentInternalFilenameRequired",
+   "type": "Rule",
+   "props": {
+    "errorEntityRelPath": "../internal_filename",
+    "errorCode": "Errorrule_1657e",
+    "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
+    "severity": "ERROR",
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "Internal Error: Field $internal_filename$ of customType attachment is not filled."
+     },
+     {
+      "locale": "de",
+      "text": "Internal Error: Field $internal_filename$ of customType attachment is not filled."
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Photo/AttachmentMimeTypeRequired",
+   "type": "Rule",
+   "props": {
+    "errorEntityRelPath": "../mime_type",
+    "errorCode": "Errorrule_0ddaa",
+    "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
+    "severity": "ERROR",
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "Internal Error: Field $mime_type$ of customType attachment is not filled."
+     },
+     {
+      "locale": "de",
+      "text": "Internal Error: Field $mime_type$ of customType attachment is not filled."
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Photo/AttachmentIdOrContentFilled",
+   "type": "Rule",
+   "props": {
+    "errorEntityRelPath": "../content",
+    "errorCode": "Errorrule_0066e",
+    "errorCondition": "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
+    "severity": "ERROR",
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+     },
+     {
+      "locale": "de",
+      "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Photo/SizeOfContentFilled",
+   "type": "Rule",
+   "props": {
+    "errorEntityRelPath": "../content",
+    "errorCode": "Errorrule_af071",
+    "errorCondition": "FieldFilled(content) and FieldNotFilled(size)",
+    "severity": "ERROR",
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "Internal Error: If the content is filled, the size must be also filled."
+     },
+     {
+      "locale": "de",
+      "text": "Internal Error: If the content is filled, the size must be also filled."
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Name",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Name"
+     },
+     {
+      "locale": "de",
+      "text": "Name"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/NameComp",
+   "type": "Computation",
+   "props": {
+    "computedFieldRelPath": "../Name",
+    "computationAlternatives": [
+     {
+      "operation": "[FirstName] + \" \" + [LastName]",
+      "precondition": "AllFieldsFilled(FirstName, LastName)"
+     }
+    ],
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "error text for computation of NameComp"
+     },
+     {
+      "locale": "de",
+      "text": "error text for computation of NameComp"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/WeeklyWorkhours",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "NumberType",
+     "NumberType": {
+      "maxFractionalDigits": 2
+     }
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Weekly Workhours"
+     },
+     {
+      "locale": "de",
+      "text": "Arbeitsstunden pro Woche"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/PersonID",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Person ID"
+     },
+     {
+      "locale": "de",
+      "text": "Personalnummer"
+     }
+    ],
+    "requirednessConfig": {
+     "mode": "absoluteOrRelativeToNextRepAncestor"
+    }
+   }
+  },
+  {
+   "path": "/Person/TypeComp",
+   "type": "Computation",
+   "props": {
+    "computedFieldRelPath": "../Type",
+    "computationAlternatives": [
+     {
+      "operation": "\"Freelancer\"",
+      "precondition": "AtLeastOneFieldFilled(FirstName, LastName)"
+     }
+    ],
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "error text for computation of TypeComp"
+     },
+     {
+      "locale": "de",
+      "text": "error text for computation of TypeComp"
+     }
+    ]
+   }
+  }
+ ]
+}

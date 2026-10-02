@@ -1,0 +1,45 @@
+{
+  "header": {
+    "id": "PersonSkills_Selection_Cm",
+    "modelType": "combination",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "purpose": "combination-base",
+        "reference": "PersonSkills_LinkFields_Base_Dc"
+      },
+      {
+        "modelType": "selection",
+        "purpose": "combination-selection",
+        "reference": "PersonSkills_NumberConversion_Se"
+      }
+    ]
+  },
+  "content": {
+    "baseModelId": "PersonSkills_LinkFields_Base_Dc",
+    "CombinationSteps": [
+      {
+        "type": "Selection",
+        "SelectionModel": {
+          "smId": "PersonSkills_NumberConversion_Se"
+        }
+      }
+    ]
+  }
+}

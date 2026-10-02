@@ -1,0 +1,1181 @@
+{
+ "_comment": "Normalized result of the installed SME 13.0.2 backend POST /api/additive-model/join (reference Person_Dc, additive PersonEmployee_Ad), recorded 2026-10-02. Element ids are omitted on purpose: SME restores the additive models original ids, the kernel prefixes them with md5(additive model id)_.",
+ "elements": [
+  {
+   "path": "/Person",
+   "type": "Group",
+   "props": {
+    "repeatability": 1
+   }
+  },
+  {
+   "path": "/Person/FirstName",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "First Name"
+     },
+     {
+      "locale": "de",
+      "text": "Vorname"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/LastName",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Last Name"
+     },
+     {
+      "locale": "de",
+      "text": "Nachname"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Type",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "EnumerationType",
+     "EnumerationType": {
+      "values": [
+       {
+        "value": "Employee",
+        "label": [
+         {
+          "locale": "en",
+          "text": "Employee"
+         },
+         {
+          "locale": "de",
+          "text": "Mitarbeiter"
+         }
+        ]
+       },
+       {
+        "value": "Freelancer",
+        "label": [
+         {
+          "locale": "en",
+          "text": "Freelancer"
+         },
+         {
+          "locale": "de",
+          "text": "Freiberufler"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Type"
+     },
+     {
+      "locale": "de",
+      "text": "Typ"
+     }
+    ],
+    "requirednessConfig": {
+     "mode": "absoluteOrRelativeToNextRepAncestor"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo",
+   "type": "Group",
+   "props": {
+    "repeatability": 1,
+    "usageType": "attachment"
+   }
+  },
+  {
+   "path": "/Person/Photo/original_filename",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/internal_filename",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/content",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType",
+     "StringType": {
+      "lineBreaksPermitted": true,
+      "noValueValidation": true
+     }
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/attachment_id",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/size",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "NumberType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/mime_type",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/category",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/description",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    }
+   }
+  },
+  {
+   "path": "/Person/Photo/AttachmentInternalFilenameRequired",
+   "type": "Rule",
+   "props": {
+    "errorEntityRelPath": "../internal_filename",
+    "errorCode": "Errorrule_1657e",
+    "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
+    "severity": "ERROR",
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "Internal Error: Field $internal_filename$ of customType attachment is not filled."
+     },
+     {
+      "locale": "de",
+      "text": "Internal Error: Field $internal_filename$ of customType attachment is not filled."
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Photo/AttachmentMimeTypeRequired",
+   "type": "Rule",
+   "props": {
+    "errorEntityRelPath": "../mime_type",
+    "errorCode": "Errorrule_0ddaa",
+    "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
+    "severity": "ERROR",
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "Internal Error: Field $mime_type$ of customType attachment is not filled."
+     },
+     {
+      "locale": "de",
+      "text": "Internal Error: Field $mime_type$ of customType attachment is not filled."
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Photo/AttachmentIdOrContentFilled",
+   "type": "Rule",
+   "props": {
+    "errorEntityRelPath": "../content",
+    "errorCode": "Errorrule_0066e",
+    "errorCondition": "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
+    "severity": "ERROR",
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+     },
+     {
+      "locale": "de",
+      "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Photo/SizeOfContentFilled",
+   "type": "Rule",
+   "props": {
+    "errorEntityRelPath": "../content",
+    "errorCode": "Errorrule_af071",
+    "errorCondition": "FieldFilled(content) and FieldNotFilled(size)",
+    "severity": "ERROR",
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "Internal Error: If the content is filled, the size must be also filled."
+     },
+     {
+      "locale": "de",
+      "text": "Internal Error: If the content is filled, the size must be also filled."
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Name",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Name"
+     },
+     {
+      "locale": "de",
+      "text": "Name"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/NameComp",
+   "type": "Computation",
+   "props": {
+    "computedFieldRelPath": "../Name",
+    "computationAlternatives": [
+     {
+      "operation": "[FirstName] + \" \" + [LastName]",
+      "precondition": "AllFieldsFilled(FirstName, LastName)"
+     }
+    ],
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "error text for computation of NameComp"
+     },
+     {
+      "locale": "de",
+      "text": "error text for computation of NameComp"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/MainLocation",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "TypeDefType",
+     "TypeDefType": {
+      "typeDefinitionId": "typedef_c2f0eead-9c32-485c-a804-5342e2663918"
+     }
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Main Location"
+     },
+     {
+      "locale": "de",
+      "text": "Hauptniederlassung"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/PersonalData",
+   "type": "Group",
+   "props": {
+    "repeatability": 1
+   }
+  },
+  {
+   "path": "/Person/PersonalData/Gender",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "EnumerationType",
+     "EnumerationType": {
+      "values": [
+       {
+        "value": "MALE",
+        "label": [
+         {
+          "locale": "en",
+          "text": "Male"
+         },
+         {
+          "locale": "de",
+          "text": "Männlich"
+         }
+        ]
+       },
+       {
+        "value": "FEMALE",
+        "label": [
+         {
+          "locale": "en",
+          "text": "Female"
+         },
+         {
+          "locale": "de",
+          "text": "Weiblich"
+         }
+        ]
+       },
+       {
+        "value": "DIVERSE",
+        "label": [
+         {
+          "locale": "en",
+          "text": "Diverse"
+         },
+         {
+          "locale": "de",
+          "text": "Divers"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Gender"
+     },
+     {
+      "locale": "de",
+      "text": "Geschlecht"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/PersonalData/DateOfBirth",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "DateType",
+     "DateType": {
+      "format": "yyyy-MM-dd"
+     }
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Date of Birth"
+     },
+     {
+      "locale": "de",
+      "text": "Geburtstag"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/PersonalData/PlaceOfBirth",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Place of Birth"
+     },
+     {
+      "locale": "de",
+      "text": "Geburtsort"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/PersonalData/Nationality",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Nationality"
+     },
+     {
+      "locale": "de",
+      "text": "Nationalität"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Addresses",
+   "type": "Group",
+   "props": {
+    "repeatability": 5
+   }
+  },
+  {
+   "path": "/Person/Addresses/Street",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Street"
+     },
+     {
+      "locale": "de",
+      "text": "Straße"
+     }
+    ],
+    "requirednessConfig": {
+     "mode": "absoluteOrRelativeToNextRepAncestor"
+    }
+   }
+  },
+  {
+   "path": "/Person/Addresses/City",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "City"
+     },
+     {
+      "locale": "de",
+      "text": "Stadt"
+     }
+    ],
+    "requirednessConfig": {
+     "mode": "absoluteOrRelativeToNextRepAncestor"
+    }
+   }
+  },
+  {
+   "path": "/Person/Addresses/Country",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Country"
+     },
+     {
+      "locale": "de",
+      "text": "Land"
+     }
+    ],
+    "requirednessConfig": {
+     "mode": "absoluteOrRelativeToNextRepAncestor"
+    }
+   }
+  },
+  {
+   "path": "/Person/Addresses/PostalCode",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType",
+     "StringType": {
+      "maxLength": 5
+     }
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Postal Code"
+     },
+     {
+      "locale": "de",
+      "text": "Postleitzahl"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Phones",
+   "type": "Group",
+   "props": {
+    "repeatability": 5
+   }
+  },
+  {
+   "path": "/Person/Phones/PhoneNumber",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Phone Number"
+     },
+     {
+      "locale": "de",
+      "text": "Telefonnummer"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Phones/Type",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "EnumerationType",
+     "EnumerationType": {
+      "values": [
+       {
+        "value": "MOBILE",
+        "label": [
+         {
+          "locale": "en",
+          "text": "Mobile"
+         },
+         {
+          "locale": "de",
+          "text": "Mobil"
+         }
+        ]
+       },
+       {
+        "value": "WORK",
+        "label": [
+         {
+          "locale": "en",
+          "text": "Work"
+         },
+         {
+          "locale": "de",
+          "text": "Arbeit"
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Type"
+     },
+     {
+      "locale": "de",
+      "text": "Art"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Education",
+   "type": "Group",
+   "props": {
+    "repeatability": 5
+   }
+  },
+  {
+   "path": "/Person/Education/SchoolName",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "School Name"
+     },
+     {
+      "locale": "de",
+      "text": "Schulname"
+     }
+    ],
+    "requirednessConfig": {
+     "mode": "absoluteOrRelativeToNextRepAncestor"
+    }
+   }
+  },
+  {
+   "path": "/Person/Education/Degree",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Degree"
+     },
+     {
+      "locale": "de",
+      "text": "Abschluss"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Education/Major",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Major"
+     },
+     {
+      "locale": "de",
+      "text": "Hauptfach"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/Education/StartDate",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "DateType",
+     "DateType": {
+      "format": "yyyy-MM-dd"
+     }
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Start Date"
+     },
+     {
+      "locale": "de",
+      "text": "Anfangsdatum"
+     }
+    ],
+    "requirednessConfig": {
+     "mode": "absoluteOrRelativeToNextRepAncestor"
+    }
+   }
+  },
+  {
+   "path": "/Person/Education/EndDate",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "DateType",
+     "DateType": {
+      "format": "yyyy-MM-dd"
+     }
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "End Date"
+     },
+     {
+      "locale": "de",
+      "text": "Abschlussdatum"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/TypeComp",
+   "type": "Computation",
+   "props": {
+    "computedFieldRelPath": "../Type",
+    "computationAlternatives": [
+     {
+      "operation": "\"Employee\"",
+      "precondition": "AtLeastOneFieldFilled(FirstName, LastName)"
+     }
+    ],
+    "errorMessage": [
+     {
+      "locale": "en",
+      "text": "error text for computation of TypeComp"
+     },
+     {
+      "locale": "de",
+      "text": "error text for computation of TypeComp"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/WeeklyWorkhours",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "NumberType",
+     "NumberType": {
+      "maxFractionalDigits": 2
+     }
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Weekly Workhours"
+     },
+     {
+      "locale": "de",
+      "text": "Arbeitsstunden pro Woche"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/Person/PersonID",
+   "type": "Field",
+   "props": {
+    "fieldType": {
+     "type": "StringType"
+    },
+    "label": [
+     {
+      "locale": "en",
+      "text": "Person ID"
+     },
+     {
+      "locale": "de",
+      "text": "Personalnummer"
+     }
+    ],
+    "requirednessConfig": {
+     "mode": "absoluteOrRelativeToNextRepAncestor"
+    }
+   }
+  }
+ ],
+ "typeDefinitions": [
+  {
+   "id": "typedef_244d7741-cef4-483d-9eb3-3a775b35d810",
+   "name": "Expierience",
+   "fieldType": {
+    "type": "EnumerationType",
+    "EnumerationType": {
+     "values": [
+      {
+       "value": "None",
+       "label": [
+        {
+         "locale": "en",
+         "text": "None"
+        },
+        {
+         "locale": "de",
+         "text": "Keine"
+        }
+       ]
+      },
+      {
+       "value": "Few",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Few"
+        },
+        {
+         "locale": "de",
+         "text": "Wenig"
+        }
+       ]
+      },
+      {
+       "value": "Some",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Some"
+        },
+        {
+         "locale": "de",
+         "text": "Einige"
+        }
+       ]
+      },
+      {
+       "value": "Much",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Much"
+        },
+        {
+         "locale": "de",
+         "text": "Viel"
+        }
+       ]
+      }
+     ],
+     "categories": [
+      {
+       "name": "AsNumber",
+       "values": [
+        "0",
+        "1",
+        "2",
+        "3"
+       ],
+       "description": ""
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "typedef_98129633-2fe5-4e23-8d9b-20e0517b5c47",
+   "name": "Proficiency",
+   "fieldType": {
+    "type": "EnumerationType",
+    "EnumerationType": {
+     "values": [
+      {
+       "value": "Basic",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Basic"
+        },
+        {
+         "locale": "de",
+         "text": "Basis"
+        }
+       ]
+      },
+      {
+       "value": "Advanced",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Advanced"
+        },
+        {
+         "locale": "de",
+         "text": "Fortgeschritten"
+        }
+       ]
+      },
+      {
+       "value": "Expert",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Expert"
+        },
+        {
+         "locale": "de",
+         "text": "Experte"
+        }
+       ]
+      }
+     ],
+     "categories": [
+      {
+       "name": "AsNumber",
+       "values": [
+        "1",
+        "2",
+        "3"
+       ],
+       "description": ""
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "typedef_c2f0eead-9c32-485c-a804-5342e2663918",
+   "name": "Location",
+   "fieldType": {
+    "type": "EnumerationType",
+    "EnumerationType": {
+     "values": [
+      {
+       "value": "Munich",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Munich"
+        },
+        {
+         "locale": "de",
+         "text": "München"
+        }
+       ]
+      },
+      {
+       "value": "Hamburg",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Hamburg"
+        },
+        {
+         "locale": "de",
+         "text": "Hamburg"
+        }
+       ]
+      },
+      {
+       "value": "Leipzig",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Leipzig"
+        },
+        {
+         "locale": "de",
+         "text": "Leipzig"
+        }
+       ]
+      },
+      {
+       "value": "Nuremberg",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Nuremberg"
+        },
+        {
+         "locale": "de",
+         "text": "Nürnberg"
+        }
+       ]
+      },
+      {
+       "value": "Aachen",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Aachen"
+        },
+        {
+         "locale": "de",
+         "text": "Aachen"
+        }
+       ]
+      },
+      {
+       "value": "Berlin",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Berlin"
+        },
+        {
+         "locale": "de",
+         "text": "Berlin"
+        }
+       ]
+      },
+      {
+       "value": "Regensburg",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Regensburg"
+        },
+        {
+         "locale": "de",
+         "text": "Regensburg"
+        }
+       ]
+      },
+      {
+       "value": "Bamberg",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Bamberg"
+        },
+        {
+         "locale": "de",
+         "text": "Bamberg"
+        }
+       ]
+      },
+      {
+       "value": "Dresden",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Dresden"
+        },
+        {
+         "locale": "de",
+         "text": "Dresden"
+        }
+       ]
+      },
+      {
+       "value": "Da Nang",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Da Nang"
+        },
+        {
+         "locale": "de",
+         "text": "Da Nang"
+        }
+       ]
+      },
+      {
+       "value": "Grenoble",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Grenoble"
+        },
+        {
+         "locale": "de",
+         "text": "Grenoble"
+        }
+       ]
+      },
+      {
+       "value": "Cologne",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Cologne"
+        },
+        {
+         "locale": "de",
+         "text": "Köln"
+        }
+       ]
+      },
+      {
+       "value": "Prague",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Prague"
+        },
+        {
+         "locale": "de",
+         "text": "Prag"
+        }
+       ]
+      },
+      {
+       "value": "Stuttgart",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Stuttgart"
+        },
+        {
+         "locale": "de",
+         "text": "Stuttgart"
+        }
+       ]
+      },
+      {
+       "value": "Washington",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Washington"
+        },
+        {
+         "locale": "de",
+         "text": "Washington"
+        }
+       ]
+      },
+      {
+       "value": "Zug",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Zug"
+        },
+        {
+         "locale": "de",
+         "text": "Zug"
+        }
+       ]
+      },
+      {
+       "value": "Porto",
+       "label": [
+        {
+         "locale": "en",
+         "text": "Porto"
+        },
+        {
+         "locale": "de",
+         "text": "Porto"
+        }
+       ]
+      }
+     ],
+     "alphabeticalSorting": true
+    }
+   }
+  }
+ ]
+}

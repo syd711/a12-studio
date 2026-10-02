@@ -27,14 +27,14 @@ class KernelDocumentModelCheckerContractTest {
 
   @Test
   void consistentModelHasNoErrors() throws IOException {
-    List<KernelFinding> findings = checker.check(read("basic/models/Company_DM.json"));
+    List<KernelFinding> findings = checker.check(TestWorkspaces.read("basic/models/Company_DM.json"));
 
     assertTrue(findings.stream().noneMatch(KernelFinding::isError), () -> "unexpected findings: " + findings);
   }
 
   @Test
   void corruptedRuleConditionIsReportedWithKernelErrorCode() throws IOException {
-    String original = read("basic/models/Company_DM.json");
+    String original = TestWorkspaces.read("basic/models/Company_DM.json");
     String condition = "\"errorCondition\": \"GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)\"";
     assertTrue(original.contains(condition), "fixture changed, adjust the test");
 
@@ -47,7 +47,7 @@ class KernelDocumentModelCheckerContractTest {
 
   @Test
   void modelWithUnexpandedIncludesIsRefused() throws IOException {
-    List<KernelFinding> findings = checker.check(read("basic/models/Invoice_DM.json"));
+    List<KernelFinding> findings = checker.check(TestWorkspaces.read("basic/models/Invoice_DM.json"));
 
     assertTrue(findings.stream().anyMatch(f -> f.isError() && f.message().contains("Unexpanded include")),
         () -> "expected the kernel to refuse unexpanded includes, got: " + findings);
@@ -55,7 +55,7 @@ class KernelDocumentModelCheckerContractTest {
 
   @Test
   void kernelVersionConstantMatchesBuildFile() throws IOException {
-    String build = Files.readString(findRoot().resolve("a12-studio-kernel/build.gradle"));
+    String build = Files.readString(TestWorkspaces.findRoot().resolve("a12-studio-kernel/build.gradle"));
     assertTrue(build.contains("kernel-md-facade:" + KernelDocumentModelChecker.KERNEL_VERSION + "'"));
     assertEquals("31.1.1", KernelDocumentModelChecker.KERNEL_VERSION);
   }
@@ -63,11 +63,11 @@ class KernelDocumentModelCheckerContractTest {
 
   @Test
   void expansionResolvesIncludesAndTheExpandedModelPassesTheConsistencyCheck() throws IOException {
-    KernelExpansion expansion = new KernelDocumentModelExpander().expand("Invoice_DM", workspaceSource("basic"));
+    KernelExpansion expansion = new KernelDocumentModelExpander().expand("Invoice_DM", TestWorkspaces.source("basic"));
 
     assertFalse(expansion.hasErrors(), () -> "expansion findings: " + expansion.findings());
     assertFalse(expansion.expandedJson().contains("\"includeConfig\""), "includes must be resolved");
-    assertTrue(expansion.expandedJson().length() > read("basic/models/Invoice_DM.json").length(), "model must have grown");
+    assertTrue(expansion.expandedJson().length() > TestWorkspaces.read("basic/models/Invoice_DM.json").length(), "model must have grown");
     List<KernelFinding> findings = checker.check(expansion.expandedJson());
     assertTrue(findings.stream().noneMatch(KernelFinding::isError), () -> "unexpected findings: " + findings);
   }
@@ -75,7 +75,7 @@ class KernelDocumentModelCheckerContractTest {
   @Test
   void combinationModelsExpandToTheirJoinedDocumentModel() throws IOException {
     for (String cm : List.of("PersonEmployee_Cm", "PersonFreelancer_Cm", "PersonSkills_LinkFields_Cm")) {
-      KernelExpansion expansion = new KernelDocumentModelExpander().expand(cm, workspaceSource("advanced_new"));
+      KernelExpansion expansion = new KernelDocumentModelExpander().expand(cm, TestWorkspaces.source("advanced_new"));
 
       assertFalse(expansion.hasErrors(), () -> cm + " expansion findings: " + expansion.findings());
       assertTrue(expansion.expandedJson().contains("\"modelRoot\""), () -> cm + " did not produce a Document Model");
@@ -84,48 +84,13 @@ class KernelDocumentModelCheckerContractTest {
 
   @Test
   void expandingAModelWithoutIncludesKeepsItConsistent() throws IOException {
-    KernelExpansion expansion = new KernelDocumentModelExpander().expand("Company_DM", workspaceSource("basic"));
+    KernelExpansion expansion = new KernelDocumentModelExpander().expand("Company_DM", TestWorkspaces.source("basic"));
 
     assertFalse(expansion.hasErrors(), () -> "expansion findings: " + expansion.findings());
   }
 
   @Test
   void expandingAnUnknownModelFailsWithKernelException() {
-    assertThrows(KernelException.class, () -> new KernelDocumentModelExpander().expand("Missing_DM", workspaceSource("basic")));
-  }
-
-  /** Model ids are file names without {@code .json}; index every json of the workspace by that. */
-  private static KernelModelSource workspaceSource(String workspace) throws IOException {
-    java.util.Map<String, Path> byId = new java.util.HashMap<>();
-    try (Stream<Path> files = Files.walk(findRoot().resolve("testing/workspaces").resolve(workspace))) {
-      files.filter(f -> f.toString().endsWith(".json"))
-          .forEach(f -> byId.putIfAbsent(f.getFileName().toString().replaceFirst("[.]json$", ""), f));
-    }
-    return id -> {
-      Path file = byId.get(id);
-      if (file == null) {
-        throw new UncheckedIOException(new java.io.FileNotFoundException(id));
-      }
-      try {
-        return Files.readString(file, StandardCharsets.UTF_8);
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
-      }
-    };
-  }
-
-  private static String read(String workspaceRelative) throws IOException {
-    return Files.readString(findRoot().resolve("testing/workspaces").resolve(workspaceRelative), StandardCharsets.UTF_8);
-  }
-
-  private static Path findRoot() {
-    Path dir = Path.of("").toAbsolutePath();
-    while (dir != null && !Files.isDirectory(dir.resolve("testing").resolve("workspaces"))) {
-      dir = dir.getParent();
-    }
-    if (dir == null) {
-      throw new IllegalStateException("testing/workspaces not found above " + Path.of("").toAbsolutePath());
-    }
-    return dir;
+    assertThrows(KernelException.class, () -> new KernelDocumentModelExpander().expand("Missing_DM", TestWorkspaces.source("basic")));
   }
 }

@@ -1,0 +1,625 @@
+{
+ "_comment": "Result of the installed SME 13.0.2 backend, POST /api/combination-model/expand {combinationModel, referencedModels}, recorded 2026-10-02. SME-only additions removed: the __meta group and header.modelReferences (SME enrichWithMetaData).",
+ "documentModel": {
+  "header": {
+   "id": "PersonSkills_LinkFields_Cm",
+   "modelType": "document",
+   "modelVersion": "29.4.0",
+   "locales": [
+    {
+     "code": "de"
+    },
+    {
+     "code": "en"
+    }
+   ],
+   "labels": [],
+   "annotations": [
+    {
+     "name": "roles",
+     "value": "reviewer,tester"
+    }
+   ]
+  },
+  "content": {
+   "modelInfo": {
+    "name": "PersonSkills_LinkFields_Cm",
+    "immutable": false
+   },
+   "modelConfig": {
+    "decimalSeparator": ".",
+    "timeZone": "UTC",
+    "conditionLanguage": {
+     "code": "en_US"
+    }
+   },
+   "typeDefinitions": [
+    {
+     "id": "typedef_244d7741-cef4-483d-9eb3-3a775b35d810",
+     "name": "Expierience",
+     "fieldType": {
+      "type": "EnumerationType",
+      "EnumerationType": {
+       "values": [
+        {
+         "value": "None",
+         "label": [
+          {
+           "locale": "en",
+           "text": "None"
+          },
+          {
+           "locale": "de",
+           "text": "Keine"
+          }
+         ]
+        },
+        {
+         "value": "Few",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Few"
+          },
+          {
+           "locale": "de",
+           "text": "Wenig"
+          }
+         ]
+        },
+        {
+         "value": "Some",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Some"
+          },
+          {
+           "locale": "de",
+           "text": "Einige"
+          }
+         ]
+        },
+        {
+         "value": "Much",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Much"
+          },
+          {
+           "locale": "de",
+           "text": "Viel"
+          }
+         ]
+        }
+       ],
+       "categories": [
+        {
+         "name": "AsNumber",
+         "values": [
+          "0",
+          "1",
+          "2",
+          "3"
+         ],
+         "description": ""
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "typedef_98129633-2fe5-4e23-8d9b-20e0517b5c47",
+     "name": "Proficiency",
+     "fieldType": {
+      "type": "EnumerationType",
+      "EnumerationType": {
+       "values": [
+        {
+         "value": "Basic",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Basic"
+          },
+          {
+           "locale": "de",
+           "text": "Basis"
+          }
+         ]
+        },
+        {
+         "value": "Advanced",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Advanced"
+          },
+          {
+           "locale": "de",
+           "text": "Fortgeschritten"
+          }
+         ]
+        },
+        {
+         "value": "Expert",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Expert"
+          },
+          {
+           "locale": "de",
+           "text": "Experte"
+          }
+         ]
+        }
+       ],
+       "categories": [
+        {
+         "name": "AsNumber",
+         "values": [
+          "1",
+          "2",
+          "3"
+         ],
+         "description": ""
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "typedef_c2f0eead-9c32-485c-a804-5342e2663918",
+     "name": "Location",
+     "fieldType": {
+      "type": "EnumerationType",
+      "EnumerationType": {
+       "values": [
+        {
+         "value": "Munich",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Munich"
+          },
+          {
+           "locale": "de",
+           "text": "München"
+          }
+         ]
+        },
+        {
+         "value": "Hamburg",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Hamburg"
+          },
+          {
+           "locale": "de",
+           "text": "Hamburg"
+          }
+         ]
+        },
+        {
+         "value": "Leipzig",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Leipzig"
+          },
+          {
+           "locale": "de",
+           "text": "Leipzig"
+          }
+         ]
+        },
+        {
+         "value": "Nuremberg",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Nuremberg"
+          },
+          {
+           "locale": "de",
+           "text": "Nürnberg"
+          }
+         ]
+        },
+        {
+         "value": "Aachen",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Aachen"
+          },
+          {
+           "locale": "de",
+           "text": "Aachen"
+          }
+         ]
+        },
+        {
+         "value": "Berlin",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Berlin"
+          },
+          {
+           "locale": "de",
+           "text": "Berlin"
+          }
+         ]
+        },
+        {
+         "value": "Regensburg",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Regensburg"
+          },
+          {
+           "locale": "de",
+           "text": "Regensburg"
+          }
+         ]
+        },
+        {
+         "value": "Bamberg",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Bamberg"
+          },
+          {
+           "locale": "de",
+           "text": "Bamberg"
+          }
+         ]
+        },
+        {
+         "value": "Dresden",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Dresden"
+          },
+          {
+           "locale": "de",
+           "text": "Dresden"
+          }
+         ]
+        },
+        {
+         "value": "Da Nang",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Da Nang"
+          },
+          {
+           "locale": "de",
+           "text": "Da Nang"
+          }
+         ]
+        },
+        {
+         "value": "Grenoble",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Grenoble"
+          },
+          {
+           "locale": "de",
+           "text": "Grenoble"
+          }
+         ]
+        },
+        {
+         "value": "Cologne",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Cologne"
+          },
+          {
+           "locale": "de",
+           "text": "Köln"
+          }
+         ]
+        },
+        {
+         "value": "Prague",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Prague"
+          },
+          {
+           "locale": "de",
+           "text": "Prag"
+          }
+         ]
+        },
+        {
+         "value": "Stuttgart",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Stuttgart"
+          },
+          {
+           "locale": "de",
+           "text": "Stuttgart"
+          }
+         ]
+        },
+        {
+         "value": "Washington",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Washington"
+          },
+          {
+           "locale": "de",
+           "text": "Washington"
+          }
+         ]
+        },
+        {
+         "value": "Zug",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Zug"
+          },
+          {
+           "locale": "de",
+           "text": "Zug"
+          }
+         ]
+        },
+        {
+         "value": "Porto",
+         "label": [
+          {
+           "locale": "en",
+           "text": "Porto"
+          },
+          {
+           "locale": "de",
+           "text": "Porto"
+          }
+         ]
+        }
+       ],
+       "alphabeticalSorting": true
+      }
+     }
+    }
+   ],
+   "modelRoot": {
+    "rootGroups": [
+     {
+      "type": "Group",
+      "id": "group_7d3ee",
+      "name": "Status",
+      "Group": {
+       "repeatability": 1,
+       "elements": [
+        {
+         "type": "Field",
+         "id": "field_d1198",
+         "name": "AcquiredAt",
+         "Field": {
+          "fieldType": {
+           "type": "StringType"
+          },
+          "label": [
+           {
+            "locale": "de",
+            "text": "Wo Erlernt?"
+           },
+           {
+            "locale": "en",
+            "text": "Acquired At?"
+           }
+          ]
+         }
+        },
+        {
+         "type": "Field",
+         "id": "field_42656",
+         "name": "Proficiency",
+         "Field": {
+          "fieldType": {
+           "type": "TypeDefType",
+           "TypeDefType": {
+            "typeDefinitionId": "typedef_98129633-2fe5-4e23-8d9b-20e0517b5c47"
+           }
+          },
+          "label": [
+           {
+            "locale": "de",
+            "text": "Level"
+           },
+           {
+            "locale": "en",
+            "text": "Proficiency"
+           }
+          ],
+          "requirednessConfig": {
+           "mode": "absoluteOrRelativeToNextRepAncestor"
+          }
+         }
+        },
+        {
+         "type": "Field",
+         "id": "field_42656_field_b78ab",
+         "name": "ProficiencyAsNumber",
+         "Field": {
+          "fieldType": {
+           "type": "NumberType",
+           "NumberType": {
+            "zeroNotAllowed": true
+           }
+          },
+          "label": [
+           {
+            "locale": "de",
+            "text": "HelperField"
+           },
+           {
+            "locale": "en",
+            "text": "HelperField"
+           }
+          ]
+         }
+        },
+        {
+         "type": "Computation",
+         "id": "field_42656_computation_21f5d",
+         "name": "ProficiencyAsNumber_Comp",
+         "Computation": {
+          "computedFieldRelPath": "../ProficiencyAsNumber",
+          "computationAlternatives": [
+           {
+            "operation": "FieldValueAsNumber(Proficiency->AsNumber)",
+            "precondition": "FieldFilled(Proficiency)"
+           }
+          ],
+          "errorCodesToSuppress": [
+           "MVK_INVALID_COMPARE_DEC_PLACES"
+          ],
+          "errorMessage": [
+           {
+            "locale": "de",
+            "text": "error text for computation of FieldAsNumber_Comp"
+           },
+           {
+            "locale": "en",
+            "text": "error text for computation of FieldAsNumber_Comp"
+           }
+          ]
+         }
+        },
+        {
+         "type": "Field",
+         "id": "field_fa543",
+         "name": "Expierience",
+         "Field": {
+          "fieldType": {
+           "type": "TypeDefType",
+           "TypeDefType": {
+            "typeDefinitionId": "typedef_244d7741-cef4-483d-9eb3-3a775b35d810"
+           }
+          },
+          "label": [
+           {
+            "locale": "de",
+            "text": "Erfahrungs-Stufe"
+           },
+           {
+            "locale": "en",
+            "text": "Expierience-Level"
+           }
+          ]
+         }
+        },
+        {
+         "type": "Field",
+         "id": "field_fa543_field_b78ab",
+         "name": "ExpierienceAsNumber",
+         "Field": {
+          "fieldType": {
+           "type": "NumberType",
+           "NumberType": {
+            "zeroNotAllowed": true
+           }
+          },
+          "label": [
+           {
+            "locale": "de",
+            "text": "HelperField"
+           },
+           {
+            "locale": "en",
+            "text": "HelperField"
+           }
+          ]
+         }
+        },
+        {
+         "type": "Computation",
+         "id": "field_fa543_computation_21f5d",
+         "name": "ExpierienceAsNumber_Comp",
+         "Computation": {
+          "computedFieldRelPath": "../ExpierienceAsNumber",
+          "computationAlternatives": [
+           {
+            "operation": "FieldValueAsNumber(Expierience->AsNumber)",
+            "precondition": "FieldFilled(Expierience)"
+           }
+          ],
+          "errorCodesToSuppress": [
+           "MVK_INVALID_COMPARE_DEC_PLACES"
+          ],
+          "errorMessage": [
+           {
+            "locale": "de",
+            "text": "error text for computation of FieldAsNumber_Comp"
+           },
+           {
+            "locale": "en",
+            "text": "error text for computation of FieldAsNumber_Comp"
+           }
+          ]
+         }
+        }
+       ]
+      }
+     },
+     {
+      "type": "Group",
+      "id": "group_a8bfd",
+      "name": "HR",
+      "Group": {
+       "repeatability": 1,
+       "elements": [
+        {
+         "type": "Field",
+         "id": "field_6e685",
+         "name": "Acknowledged",
+         "Field": {
+          "fieldType": {
+           "type": "ConfirmType"
+          },
+          "label": [
+           {
+            "locale": "de",
+            "text": "Anerkannt?"
+           },
+           {
+            "locale": "en",
+            "text": "Acknowledged?"
+           }
+          ]
+         }
+        }
+       ]
+      }
+     }
+    ]
+   }
+  }
+ },
+ "warnings": [
+  "WARNING: Roles (annotations with name 'roles') will not be joined. (PersonSkills_LinkFields_Cm)"
+ ]
+}
