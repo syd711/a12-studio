@@ -29,6 +29,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
@@ -39,6 +40,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
   private final ProjectTreeMenuActions menuFactory;
   private final ProjectTreeContextMenu contextMenuFactory;
   private final AtomicReference<ProjectItemViewModel> dragSource;
+  private final Predicate<ProjectItemViewModel> hasOutgoingChanges;
 
   private final FontIcon icon = new FontIcon();
 
@@ -54,7 +56,9 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
 
   ProjectTreeCell(@NonNull Consumer<ProjectItemViewModel> onOpen, @NonNull ProjectTreeMenuActions menuFactory,
                   @NonNull ProjectTreeContextMenu contextMenuFactory,
-                  @NonNull AtomicReference<ProjectItemViewModel> dragSource) {
+                  @NonNull AtomicReference<ProjectItemViewModel> dragSource,
+                  @NonNull Predicate<ProjectItemViewModel> hasOutgoingChanges) {
+    this.hasOutgoingChanges = hasOutgoingChanges;
     this.onOpen = onOpen;
     this.menuFactory = menuFactory;
     this.contextMenuFactory = contextMenuFactory;
@@ -170,6 +174,10 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       }
       String messages = validationErrors.stream().map(error -> "• " + error.message()).collect(Collectors.joining("\n"));
       Tooltip.install(nameLabel, WidgetFactory.createTooltip(item.getDisplayName() + "\n" + messages));
+    }
+
+    if (validationErrors.isEmpty() && !item.isFolder() && hasOutgoingChanges.test(item)) {
+      nameLabel.getStyleClass().add("git-changed");
     }
 
     Node nodeIcon;

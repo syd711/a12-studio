@@ -23,9 +23,16 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
+import javafx.scene.Node;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
@@ -45,6 +52,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Slf4j
 public class VersioncontrolPanelController implements Initializable, StudioEventListener {
@@ -74,6 +84,18 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   private Button pushButton;
 
   @FXML
+  private SplitMenuButton pullButton;
+
+  @FXML
+  private Button stashButton;
+
+  @FXML
+  private Button stashPopButton;
+
+  @FXML
+  private Tooltip stashPopTooltip;
+
+  @FXML
   private Button collapseProjectViewButton;
 
   @FXML
@@ -82,14 +104,33 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   @FXML
   private Button commitButton;
 
+  @FXML
+  private VersioncontrolHistoryPanelController historyPanelController;
+
+  /** The history panel's root (injected from the {@code fx:include}'s fx:id). */
+  @FXML
+  private Node historyPanel;
+
+  @FXML
+  private SplitPane historySplitPane;
+
+  private static final int HISTORY_LIMIT = 200;
+  private static final double HISTORY_DIVIDER_POSITION = 0.65;
+  /** Keeps the outside-project tree's folder nodes apart from the project tree's in {@link #checkedByPath}. */
+  private static final String OUTSIDE_FOLDER_KEY_PREFIX = "<repository>/";
+
   private final Map<String, SimpleBooleanProperty> checkedByPath = new HashMap<>();
   private final VersionControlSettings settings = VersionControlSettings.load();
 
   private Project project;
   private List<GitChangedFile> currentChangedFiles = List.of();
+  private List<String> currentStashes = List.of();
   private GitBranchStatus currentBranchStatus;
+  /** File whose history is shown; {@code null} shows the history of the whole project. */
+  private File historyScope;
   private boolean updatingCommitMessageField = false;
 
+  private Consumer<Boolean> historyVisibilityCallback;
   private Runnable collapseProjectViewCallback;
   private Runnable projectRefreshCallback;
 
@@ -108,6 +149,32 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     this.projectRefreshCallback = callback;
   }
 
+  /** Notified whenever the history panel is shown or hidden (by {@link #setHistoryVisible} or its collapse button). */
+  public void setHistoryVisibilityCallback(Consumer<Boolean> callback) {
+    this.historyVisibilityCallback = callback;
+  }
+
+  public boolean isHistoryVisible() {
+    return historySplitPane.getItems().contains(historyPanel);
+  }
+
+  /** Shows or hides the version history below the changes tree; hiding gives the tree the full height. */
+  public void setHistoryVisible(boolean visible) {
+    if (visible == isHistoryVisible()) {
+      return;
+    }
+    if (visible) {
+      historySplitPane.getItems().add(historyPanel);
+      historySplitPane.setDividerPositions(HISTORY_DIVIDER_POSITION);
+    }
+    else {
+      historySplitPane.getItems().remove(historyPanel);
+    }
+    if (historyVisibilityCallback != null) {
+      historyVisibilityCallback.accept(visible);
+    }
+  }
+
   @FXML
   private void onCollapseProjectView() {
     if (collapseProjectViewCallback != null) {
@@ -121,6 +188,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
       private final CheckBox checkBox = new CheckBox();
       private final Label nameLabel = new Label();
       private final HBox graphic = new HBox(4, checkBox, nameLabel);
+      private final ContextMenu fileMenu = createFileContextMenu(this::getItem);
 
       {
         nameLabel.getStyleClass().add("tree-cell-name-label");
@@ -131,6 +199,14 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
             return;
           }
           setCheckedRecursive(getTreeItem(), newVal);
+          if (newVal && getTreeItem().getParent() == changesTree.getRoot()) {
+            // Checking one of the two top-level nodes (project / rest of the repository) clears the other one.
+            for (TreeItem<VersioncontrolTreeNode> otherRoot : changesTree.getRoot().getChildren()) {
+              if (otherRoot != getTreeItem()) {
+                setCheckedRecursive(otherRoot, false);
+              }
+            }
+          }
           updateActionButtons();
         });
       }
@@ -140,22 +216,39 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
         super.updateItem(node, empty);
         if (empty || node == null) {
           setGraphic(null);
+          setContextMenu(null);
           return;
         }
+        setContextMenu(node.isFolder() ? null : fileMenu);
         SimpleBooleanProperty prop = checkedByPath.computeIfAbsent(node.getRelativePath(), p -> new SimpleBooleanProperty(false));
         checkBox.selectedProperty().unbind();
         checkBox.setSelected(prop.get());
         prop.addListener((o, ov, nv) -> checkBox.setSelected(nv));
 
         nameLabel.setText(node.getDisplayName());
-        graphic.getChildren().setAll(checkBox,
-            node.isFolder() ? WidgetFactory.createIcon(Icons.FOLDER_OUTLINE) : statusIcon(node.getChangedFile().status()),
-            nameLabel);
+        nameLabel.getStyleClass().removeAll("git-new", "git-changed");
+        if (!node.isFolder()) {
+          ChangeStatus status = node.getChangedFile().status();
+          if (status == ChangeStatus.NEW) {
+            nameLabel.getStyleClass().add("git-new");
+          }
+          else if (status == ChangeStatus.MODIFIED) {
+            nameLabel.getStyleClass().add("git-changed");
+          }
+        }
+        if (node.isFolder()) {
+          graphic.getChildren().setAll(checkBox,
+              WidgetFactory.createIcon(getTreeItem().getParent() == changesTree.getRoot() ? Icons.FOLDER : Icons.FOLDER_OUTLINE),
+              nameLabel);
+        }
+        else {
+          graphic.getChildren().setAll(checkBox, nameLabel);
+        }
         setGraphic(graphic);
       }
     });
 
-    changesTree.setShowRoot(true);
+    changesTree.setShowRoot(false);
 
     commitMessageField.textProperty().addListener((obs, oldVal, newVal) -> {
       updateActionButtons();
@@ -166,20 +259,67 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
       settings.save();
     });
 
+    historyPanelController.setOnClearScope(this::onClearHistoryScope);
+    historyPanelController.setOnCollapse(() -> setHistoryVisible(false));
+    historyPanelController.setOnRestore((file, commit) -> {
+      GitService gitService = Studio.getGitService();
+      if (gitService != null) {
+        VersionControlActions.restoreVersion(getStage(), gitService, file, commit);
+      }
+    });
 
     updateActionButtons();
     showBranchStatus(null);
+    updateHistoryScopeUi();
 
     StudioEventManager.getInstance().addListener(this);
   }
 
-  private FontIcon statusIcon(ChangeStatus status) {
-    return switch (status) {
-      case NEW -> WidgetFactory.createGreenIcon(Icons.PLUS);
-      case MODIFIED -> WidgetFactory.createIcon(Icons.PENCIL);
-      case DELETED -> WidgetFactory.createAlertIcon(Icons.TRASH);
-      case CONFLICTING -> WidgetFactory.createExclamationIcon();
-    };
+  /** Commit / revert / history entries for a single changed file, shown on right-click in the changes tree. */
+  private ContextMenu createFileContextMenu(Supplier<VersioncontrolTreeNode> nodeSupplier) {
+    MenuItem commit = new MenuItem(StudioBundle.get("versioncontrol_tree.commit"));
+    commit.setGraphic(WidgetFactory.createIcon(Icons.GIT_COMMIT));
+    commit.setOnAction(e -> withSelectedFile(nodeSupplier, file -> {
+      GitService gitService = Studio.getGitService();
+      if (gitService != null && project != null) {
+        VersionControlActions.commit(getStage(), project, gitService, file);
+      }
+    }));
+    MenuItem revert = new MenuItem(StudioBundle.get("versioncontrol_tree.revert"));
+    revert.setGraphic(WidgetFactory.createIcon(Icons.UNDO));
+    revert.setOnAction(e -> withSelectedFile(nodeSupplier, file -> {
+      GitService gitService = Studio.getGitService();
+      if (gitService != null) {
+        VersionControlActions.revert(getStage(), gitService, file);
+      }
+    }));
+    MenuItem history = new MenuItem(StudioBundle.get("versioncontrol_tree.show_history"));
+    history.setGraphic(WidgetFactory.createIcon(Icons.HISTORY));
+    history.setOnAction(e -> withSelectedFile(nodeSupplier, file -> showFileHistory(file.file())));
+    return new ContextMenu(commit, revert, new SeparatorMenuItem(), history);
+  }
+
+  private void withSelectedFile(Supplier<VersioncontrolTreeNode> nodeSupplier, Consumer<GitChangedFile> action) {
+    VersioncontrolTreeNode node = nodeSupplier.get();
+    if (node != null && !node.isFolder()) {
+      action.accept(node.getChangedFile());
+    }
+  }
+
+  private void showFileHistory(File file) {
+    historyScope = file;
+    updateHistoryScopeUi();
+    refresh();
+  }
+
+  private void onClearHistoryScope() {
+    historyScope = null;
+    updateHistoryScopeUi();
+    refresh();
+  }
+
+  private void updateHistoryScopeUi() {
+    historyPanelController.setScope(historyScope);
   }
 
   // -------------------------------------------------------------------------
@@ -201,6 +341,8 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
    */
   public void setProject(Project project) {
     this.project = project;
+    historyScope = null;
+    updateHistoryScopeUi();
     updatingCommitMessageField = true;
     commitMessageField.setText(project == null
         ? ""
@@ -213,7 +355,11 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   @Override
   public void projectClosed(@NonNull ProjectClosedEvent event) {
     this.project = null;
+    historyScope = null;
+    updateHistoryScopeUi();
     currentChangedFiles = List.of();
+    currentStashes = List.of();
+    historyPanelController.clear();
     setTreeRoot(null);
     showBranchStatus(null);
     updateActionButtons();
@@ -242,23 +388,30 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     GitService gitService = Studio.getGitService();
     if (gitService == null || project == null) {
       currentChangedFiles = List.of();
+      currentStashes = List.of();
+      historyPanelController.clear();
       setTreeRoot(null);
       showBranchStatus(null);
       updateActionButtons();
       return;
     }
     File projectFolder = project.getFolder();
+    File scope = historyScope != null ? historyScope : projectFolder;
     JFXFuture.supplyAsync(() -> {
           try {
-            return new RefreshResult(gitService.getChangedProjectFiles(projectFolder), gitService.getBranchStatus());
+            return new RefreshResult(gitService.getChangedProjectFiles(projectFolder),
+                gitService.getChangedFilesOutsideProject(projectFolder), gitService.getBranchStatus(),
+                gitService.getStashes(), gitService.getHistory(scope, HISTORY_LIMIT));
           }
           catch (GitAPIException | IOException e) {
             throw new RuntimeException(e);
           }
         })
         .thenAcceptLater(result -> {
+          currentStashes = result.stashes();
+          historyPanelController.setItems(result.history());
           showBranchStatus(result.branchStatus());
-          populateTree(result.changedFiles());
+          populateTree(result.changedFiles(), result.outsideFiles());
         })
         .onErrorLater(ex -> {
           log.error("Failed to refresh git status for '{}'", projectFolder, ex);
@@ -266,7 +419,8 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
         });
   }
 
-  private record RefreshResult(List<GitChangedFile> changedFiles, GitBranchStatus branchStatus) {
+  private record RefreshResult(List<GitChangedFile> changedFiles, List<GitChangedFile> outsideFiles,
+                               GitBranchStatus branchStatus, List<String> stashes, List<GitCommitInfo> history) {
   }
 
   /** Updates the branch bar above the changes tree; {@code null} hides it (no project/repository). */
@@ -300,18 +454,30 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     }
   }
 
-  private void populateTree(List<GitChangedFile> changedFiles) {
-    this.currentChangedFiles = changedFiles;
-    if (changedFiles.isEmpty()) {
-      // buildTree() would otherwise still produce a root folder node with no children - a tree
-      // consisting only of folders, with no actual changed files - which should show the
+  private void populateTree(List<GitChangedFile> changedFiles, List<GitChangedFile> outsideFiles) {
+    List<GitChangedFile> all = new ArrayList<>(changedFiles);
+    all.addAll(outsideFiles);
+    this.currentChangedFiles = all;
+    if (all.isEmpty()) {
+      // A tree consisting only of folders, with no actual changed files, should show the
       // "no changes" placeholder instead of an empty tree.
       setTreeRoot(null);
     }
     else {
-      TreeItem<VersioncontrolTreeNode> root = buildTree(changedFiles);
-      setExpandedRecursive(root, true);
-      setTreeRoot(root);
+      // The two top-level nodes (project / rest of the repository) hang off an invisible root.
+      TreeItem<VersioncontrolTreeNode> hiddenRoot = new TreeItem<>();
+      if (!changedFiles.isEmpty()) {
+        String rootLabel = project != null ? project.getFolder().getName() : StudioBundle.get("versioncontrol");
+        hiddenRoot.getChildren().add(buildTree(rootLabel, "", changedFiles, GitChangedFile::relativePath));
+      }
+      if (!outsideFiles.isEmpty()) {
+        GitService gitService = Studio.getGitService();
+        Function<GitChangedFile, String> repoPath = file -> gitService.repositoryRelativePath(file.file());
+        hiddenRoot.getChildren().add(buildTree(StudioBundle.get("versioncontrol_outside_project"), OUTSIDE_FOLDER_KEY_PREFIX,
+            outsideFiles, repoPath));
+      }
+      setExpandedRecursive(hiddenRoot, true);
+      setTreeRoot(hiddenRoot);
     }
     updateActionButtons();
   }
@@ -336,17 +502,22 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     noChangesLabel.setManaged(root == null);
   }
 
-  private TreeItem<VersioncontrolTreeNode> buildTree(List<GitChangedFile> changedFiles) {
-    String rootLabel = project != null ? project.getFolder().getName() : StudioBundle.get("versioncontrol");
-    TreeItem<VersioncontrolTreeNode> root = new TreeItem<>(VersioncontrolTreeNode.folder("", rootLabel));
+  /**
+   * @param folderKeyPrefix prefix for the folder nodes' keys in {@link #checkedByPath}, keeping the
+   *                        project's and the outside-project tree's folders apart
+   * @param treePath        the path (forward-slash separated) that decides where a file sits in the tree
+   */
+  private TreeItem<VersioncontrolTreeNode> buildTree(String rootLabel, String folderKeyPrefix, List<GitChangedFile> changedFiles,
+                                                     Function<GitChangedFile, String> treePath) {
+    TreeItem<VersioncontrolTreeNode> root = new TreeItem<>(VersioncontrolTreeNode.folder(folderKeyPrefix, rootLabel));
     Map<String, TreeItem<VersioncontrolTreeNode>> foldersByPath = new HashMap<>();
     foldersByPath.put("", root);
 
     List<GitChangedFile> sorted = new ArrayList<>(changedFiles);
-    sorted.sort(Comparator.comparing(GitChangedFile::relativePath));
+    sorted.sort(Comparator.comparing(treePath));
 
     for (GitChangedFile file : sorted) {
-      String[] segments = file.relativePath().split("/");
+      String[] segments = treePath.apply(file).split("/");
       TreeItem<VersioncontrolTreeNode> parent = root;
       StringBuilder pathBuilder = new StringBuilder();
       for (int i = 0; i < segments.length - 1; i++) {
@@ -357,7 +528,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
         String folderPath = pathBuilder.toString();
         TreeItem<VersioncontrolTreeNode> folderItem = foldersByPath.get(folderPath);
         if (folderItem == null) {
-          folderItem = new TreeItem<>(VersioncontrolTreeNode.folder(folderPath, segments[i]));
+          folderItem = new TreeItem<>(VersioncontrolTreeNode.folder(folderKeyPrefix + folderPath, segments[i]));
           parent.getChildren().add(folderItem);
           foldersByPath.put(folderPath, folderItem);
         }
@@ -415,6 +586,18 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     if (pushButton != null) {
       pushButton.setDisable(currentBranchStatus == null || !currentBranchStatus.canPush(true));
     }
+    if (pullButton != null) {
+      pullButton.setDisable(currentBranchStatus == null || currentBranchStatus.detached() || !currentBranchStatus.hasRemote());
+    }
+    if (stashButton != null) {
+      stashButton.setDisable(project == null || currentChangedFiles.isEmpty());
+    }
+    if (stashPopButton != null) {
+      stashPopButton.setDisable(currentStashes.isEmpty());
+      stashPopTooltip.setText(currentStashes.isEmpty()
+          ? StudioBundle.get("versioncontrol_stash_pop")
+          : StudioBundle.get("versioncontrol_stash_pop_tooltip", currentStashes.size(), currentStashes.get(0)));
+    }
   }
 
   @FXML
@@ -436,7 +619,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
         () -> gitService.revert(files));
     ProgressResultModel result = ProgressDialog.createProgressDialog(getStage(), progressModel);
     if (result.isSuccess()) {
-      onRevertCompleted();
+      onFilesChangedOnDisk();
     }
     else if (!result.isCancelled()) {
       log.error("Failed to revert changes");
@@ -444,16 +627,16 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   }
 
   /**
-   * A revert isn't limited to the file(s) actually checked - the on-disk state it restores can
-   * differ from what any single file's status suggested - so rather than patching up just the
-   * reverted files' project items, {@link #projectRefreshCallback} (wired to {@link
+   * A revert, pull, stash or stash pop isn't limited to the file(s) the user had in mind - the
+   * on-disk state it leaves can differ from what any single file's status suggested - so rather
+   * than patching up individual project items, {@link #projectRefreshCallback} (wired to {@link
    * de.a12.studio.ui.RootController#reloadProject()}) reloads the whole project from disk and
    * rebuilds every open tab/detached window's editor content from it, closing any tab whose file
-   * the revert deleted. The tail {@link StudioEventManager#fireGitStatusChangedEvent} refreshes
+   * the operation deleted. The tail {@link StudioEventManager#fireGitStatusChangedEvent} refreshes
    * this panel itself (via {@link #gitStatusChanged}) as well as any open editor's Commit/Revert
    * toolbar buttons.
    */
-  private void onRevertCompleted() {
+  private void onFilesChangedOnDisk() {
     if (projectRefreshCallback != null) {
       projectRefreshCallback.run();
     }
@@ -514,6 +697,176 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     }
     // Ahead/behind counts change on success, and a rejected push may still have updated nothing - refresh either way.
     StudioEventManager.getInstance().fireGitStatusChangedEvent();
+  }
+
+  // -------------------------------------------------------------------------
+  // Pull
+  // -------------------------------------------------------------------------
+
+  /** The button's main action follows the repository's {@code pull.rebase} setting; the menu offers both explicitly. */
+  @FXML
+  private void onPull() {
+    GitService gitService = Studio.getGitService();
+    if (gitService != null) {
+      pull(gitService, gitService.prefersRebase());
+    }
+  }
+
+  @FXML
+  private void onPullRebase() {
+    GitService gitService = Studio.getGitService();
+    if (gitService != null) {
+      pull(gitService, true);
+    }
+  }
+
+  @FXML
+  private void onPullMerge() {
+    GitService gitService = Studio.getGitService();
+    if (gitService != null) {
+      pull(gitService, false);
+    }
+  }
+
+  private void pull(GitService gitService, boolean rebase) {
+    if (currentBranchStatus == null || currentBranchStatus.detached() || !currentBranchStatus.hasRemote()) {
+      return;
+    }
+    try {
+      if (!gitService.canPull()) {
+        WidgetFactory.showAlert(getStage(), StudioBundle.get("versioncontrol_pull_no_upstream", currentBranchStatus.branch()));
+        return;
+      }
+      // A rebase refuses to start on a dirty working tree; offer to carry the changes across it instead of failing.
+      boolean autostash = false;
+      if (rebase && gitService.hasUncommittedChanges()) {
+        Optional<ButtonType> confirmation = WidgetFactory.showConfirmation(getStage(),
+            StudioBundle.get("versioncontrol_pull_autostash"), StudioBundle.get("versioncontrol_pull_autostash_help"), null,
+            StudioBundle.get("versioncontrol_pull_autostash_ok"));
+        if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
+          return;
+        }
+        autostash = true;
+      }
+      if (!ensureIdentity(gitService)) {
+        return;
+      }
+      boolean stashFirst = autostash;
+      GitOperationProgressModel progressModel = new GitOperationProgressModel(StudioBundle.get("versioncontrol_pulling"),
+          () -> gitService.pull(rebase, stashFirst));
+      ProgressResultModel result = ProgressDialog.createProgressDialog(getStage(), progressModel);
+      if (!result.isSuccess() && !result.isCancelled()) {
+        log.error("Failed to pull");
+        offerAbortIfUnfinished(gitService);
+      }
+      // Even a failed pull may have changed files (conflict markers, a partly applied rebase).
+      onFilesChangedOnDisk();
+    }
+    catch (GitAPIException | IOException e) {
+      log.error("Failed to prepare pull", e);
+      WidgetFactory.showAlert(getStage(), StudioBundle.get("versioncontrol_git_failed", "pull", e.getMessage()));
+    }
+  }
+
+  /** A pull that hit conflicts stays unfinished; let the user resolve them or go back to where they started. */
+  private void offerAbortIfUnfinished(GitService gitService) {
+    if (!gitService.isOperationInProgress()) {
+      return;
+    }
+    Optional<ButtonType> choice = WidgetFactory.showAlertOption(getStage(), StudioBundle.get("versioncontrol_pull_conflicts"),
+        StudioBundle.get("versioncontrol_pull_abort"), StudioBundle.get("versioncontrol_pull_resolve"),
+        StudioBundle.get("versioncontrol_pull_conflicts_help"), null);
+    if (choice.isPresent() && choice.get() == ButtonType.APPLY) {
+      try {
+        gitService.abortOperation();
+      }
+      catch (GitAPIException e) {
+        log.error("Failed to abort unfinished pull", e);
+        WidgetFactory.showAlert(getStage(), e.getMessage());
+      }
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Stash
+  // -------------------------------------------------------------------------
+
+  @FXML
+  private void onStash() {
+    GitService gitService = Studio.getGitService();
+    if (gitService == null || currentChangedFiles.isEmpty() || !ensureIdentity(gitService)) {
+      return;
+    }
+    String message = WidgetFactory.showInputDialog(getStage(), StudioBundle.get("versioncontrol_stash"),
+        StudioBundle.get("versioncontrol_stash_message_title"), StudioBundle.get("versioncontrol_stash_description"),
+        StudioBundle.get("versioncontrol_stash_message_help"), "");
+    if (message == null) {
+      return;
+    }
+    GitOperationProgressModel progressModel = new GitOperationProgressModel(StudioBundle.get("versioncontrol_stashing"),
+        () -> gitService.stash(message));
+    ProgressResultModel result = ProgressDialog.createProgressDialog(getStage(), progressModel);
+    if (!result.isSuccess() && !result.isCancelled()) {
+      log.error("Failed to stash");
+    }
+    onFilesChangedOnDisk();
+  }
+
+  @FXML
+  private void onStashPop() {
+    GitService gitService = Studio.getGitService();
+    if (gitService == null || currentStashes.isEmpty() || !ensureIdentity(gitService)) {
+      return;
+    }
+    GitOperationProgressModel progressModel = new GitOperationProgressModel(StudioBundle.get("versioncontrol_stash_popping"),
+        gitService::stashPop);
+    ProgressResultModel result = ProgressDialog.createProgressDialog(getStage(), progressModel);
+    if (!result.isSuccess() && !result.isCancelled()) {
+      log.error("Failed to pop stash");
+    }
+    onFilesChangedOnDisk();
+  }
+
+  // -------------------------------------------------------------------------
+  // Git settings
+  // -------------------------------------------------------------------------
+
+  /**
+   * Merging, rebasing and stashing create commits, which git refuses to do without {@code user.name}/{@code user.email}.
+   * If either is missing, asks for them - for this repository only, or for every repository - and writes them.
+   *
+   * @return whether an identity is configured now
+   */
+  private boolean ensureIdentity(GitService gitService) {
+    if (gitService.hasIdentity()) {
+      return true;
+    }
+    ConfirmationResult confirmation = WidgetFactory.showConfirmationWithCheckbox(getStage(),
+        StudioBundle.get("versioncontrol_identity_missing"), StudioBundle.get("versioncontrol_identity_configure"),
+        StudioBundle.get("versioncontrol_identity_help"), null, StudioBundle.get("versioncontrol_identity_global"), false);
+    if (!confirmation.isOkClicked()) {
+      return false;
+    }
+    String name = WidgetFactory.showInputDialog(getStage(), StudioBundle.get("versioncontrol_identity_title"),
+        StudioBundle.get("versioncontrol_identity_name"), StudioBundle.get("versioncontrol_identity_name_description"), null,
+        System.getProperty("user.name", ""));
+    if (name == null || name.isBlank()) {
+      return false;
+    }
+    String email = WidgetFactory.showInputDialog(getStage(), StudioBundle.get("versioncontrol_identity_title"),
+        StudioBundle.get("versioncontrol_identity_email"), StudioBundle.get("versioncontrol_identity_email_description"), null, "");
+    if (email == null || email.isBlank()) {
+      return false;
+    }
+    try {
+      gitService.setIdentity(name.trim(), email.trim(), confirmation.isChecked());
+      return true;
+    }
+    catch (GitAPIException e) {
+      log.error("Failed to store git identity", e);
+      WidgetFactory.showAlert(getStage(), e.getMessage());
+      return false;
+    }
   }
 
   private Stage getStage() {

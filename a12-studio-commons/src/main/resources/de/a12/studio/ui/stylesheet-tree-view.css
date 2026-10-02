@@ -344,6 +344,19 @@
 }
 
 /*
+ * Git change coloring of a file's name: a new file in green (Versioncontrol changes tree), a changed one in blue
+ * (Versioncontrol changes tree and project tree, where an error/warning takes precedence - see ProjectTreeCell).
+ * The selected-row overrides for #projectTree/#changesTree further down restore the inverse text color on top.
+ */
+.tree-cell-name-label.git-new {
+    -fx-text-fill: -fx-change-new-bg;
+}
+
+.tree-cell-name-label.git-changed {
+    -fx-text-fill: -fx-change-bg;
+}
+
+/*
  * ID-scoped overrides for the plain project TreeView (fx:id="projectTree").
  * Uses a softer, more muted blue than the vivid accent color used elsewhere.
  */

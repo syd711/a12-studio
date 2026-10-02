@@ -100,6 +100,10 @@ public class RootController implements Initializable, StudioEventListener {
   @FXML
   private ToggleButton versioncontrolToggle;
 
+  /** Shows/hides the version history inside the version control panel; only visible while that panel is active. */
+  @FXML
+  private ToggleButton versioncontrolHistoryToggle;
+
   // Lazily loaded bookmarks panel
   private Parent bookmarksPanelRoot;
   private BookmarksPanelController bookmarksPanelController;
@@ -134,6 +138,10 @@ public class RootController implements Initializable, StudioEventListener {
     attachSidePanelDividerListener();
 
     projectTreeController.setCollapseProjectViewCallback(this::collapseProjectView);
+
+    // A selected versioncontrolToggle implies it is visible (it is deselected when unavailable).
+    versioncontrolHistoryToggle.visibleProperty().bind(versioncontrolToggle.selectedProperty());
+    versioncontrolHistoryToggle.managedProperty().bind(versioncontrolToggle.selectedProperty());
 
     consolePanelController.setOnMinimize(this::minimizeConsole);
     consolePanelController.setOnUndock(this::undockConsole);
@@ -413,6 +421,14 @@ public class RootController implements Initializable, StudioEventListener {
   }
 
   @FXML
+  private void onVersioncontrolHistoryToggle() {
+    getVersioncontrolPanelRoot();
+    if (versioncontrolPanelController != null) {
+      versioncontrolPanelController.setHistoryVisible(versioncontrolHistoryToggle.isSelected());
+    }
+  }
+
+  @FXML
   private void onVersioncontrolToggle() {
     if (versioncontrolToggle.isSelected()) {
       projectViewToggle.setSelected(false);
@@ -592,6 +608,8 @@ public class RootController implements Initializable, StudioEventListener {
         versioncontrolPanelController = loader.getController();
         versioncontrolPanelController.setCollapseProjectViewCallback(this::collapseProjectView);
         versioncontrolPanelController.setProjectRefreshCallback(this::reloadProject);
+        versioncontrolPanelController.setHistoryVisibilityCallback(versioncontrolHistoryToggle::setSelected);
+        versioncontrolPanelController.setHistoryVisible(versioncontrolHistoryToggle.isSelected());
         // Lazily loaded, so it may have missed the ProjectOpenedEvent for an already-open project.
         versioncontrolPanelController.setProject(project);
       } catch (Exception e) {

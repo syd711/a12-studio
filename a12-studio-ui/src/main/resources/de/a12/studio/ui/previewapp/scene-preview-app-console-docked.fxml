@@ -22,7 +22,7 @@
                <children>
                   <Button fx:id="dockedDeployBtn" accessibleText="%deploy_models" disable="true" mnemonicParsing="false" onAction="#onDockedDeploy" styleClass="menu-bar-button, deploy-models-button, preview-app-button">
                      <graphic>
-                        <FontIcon iconLiteral="mdi2c-cloud-upload-outline" iconSize="18" styleClass="toolbar-icon" />
+                        <FontIcon iconLiteral="mdi2f-folder-upload" iconSize="18" styleClass="toolbar-icon" />
                      </graphic>
                      <tooltip><Tooltip text="%deploy_models" /></tooltip>
                   </Button>

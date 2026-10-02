@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,6 +71,27 @@ public class VersionControlActions {
     }
     else if (!result.isCancelled()) {
       log.error("Failed to revert '{}'", file.file());
+    }
+  }
+
+  /** Replaces {@code file} with its version from {@code commit}, after confirmation. */
+  public static void restoreVersion(@NonNull Stage stage, @NonNull GitService gitService, @NonNull File file,
+      @NonNull GitCommitInfo commit) {
+    Optional<ButtonType> confirmation = WidgetFactory.showConfirmation(stage,
+        StudioBundle.get("confirm_restore_version", file.getName(), commit.shortId()), null, null,
+        StudioBundle.get("versioncontrol_restore_version"));
+    if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
+      return;
+    }
+
+    GitOperationProgressModel progressModel = new GitOperationProgressModel(StudioBundle.get("versioncontrol_restoring"),
+        () -> gitService.restoreFromCommit(file, commit.id()));
+    ProgressResultModel result = ProgressDialog.createProgressDialog(stage, progressModel);
+    if (result.isSuccess()) {
+      onRevertCompleted();
+    }
+    else if (!result.isCancelled()) {
+      log.error("Failed to restore '{}' from commit {}", file, commit.id());
     }
   }
 

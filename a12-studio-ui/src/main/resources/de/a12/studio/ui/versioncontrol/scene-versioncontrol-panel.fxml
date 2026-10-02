@@ -4,7 +4,10 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
@@ -38,12 +41,41 @@
                         </tooltip>
                     </Button>
                     <Separator orientation="VERTICAL" />
+                    <SplitMenuButton fx:id="pullButton" accessibleText="%versioncontrol_pull" mnemonicParsing="false" onAction="#onPull" styleClass="default-button">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi2c-cloud-download-outline" iconSize="18" styleClass="toolbar-icon" />
+                        </graphic>
+                        <items>
+                            <MenuItem mnemonicParsing="false" onAction="#onPullRebase" text="%versioncontrol_pull_rebase" />
+                            <MenuItem mnemonicParsing="false" onAction="#onPullMerge" text="%versioncontrol_pull_merge" />
+                        </items>
+                        <tooltip>
+                            <Tooltip text="%versioncontrol_pull_tooltip" />
+                        </tooltip>
+                    </SplitMenuButton>
                     <Button fx:id="pushButton" accessibleText="%versioncontrol_push" mnemonicParsing="false" onAction="#onPush" styleClass="default-button">
                         <graphic>
                             <FontIcon iconLiteral="mdi2c-cloud-upload-outline" iconSize="18" styleClass="toolbar-icon" />
                         </graphic>
                         <tooltip>
                             <Tooltip text="%versioncontrol_push" />
+                        </tooltip>
+                    </Button>
+                    <Separator orientation="VERTICAL" />
+                    <Button fx:id="stashButton" accessibleText="%versioncontrol_stash" mnemonicParsing="false" onAction="#onStash" styleClass="default-button">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi2a-archive-arrow-down-outline" iconSize="18" styleClass="toolbar-icon" />
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%versioncontrol_stash_tooltip" />
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="stashPopButton" accessibleText="%versioncontrol_stash_pop" mnemonicParsing="false" onAction="#onStashPop" styleClass="default-button">
+                        <graphic>
+                            <FontIcon iconLiteral="mdi2a-archive-arrow-up-outline" iconSize="18" styleClass="toolbar-icon" />
+                        </graphic>
+                        <tooltip>
+                            <Tooltip fx:id="stashPopTooltip" text="%versioncontrol_stash_pop" />
                         </tooltip>
                     </Button>
                     <Separator orientation="VERTICAL" />
@@ -77,44 +109,47 @@
         </VBox>
     </top>
     <center>
-        <VBox BorderPane.alignment="CENTER">
-            <children>
-                <HBox fx:id="branchBar" alignment="CENTER_LEFT" spacing="8.0" styleClass="versioncontrol-branch-bar">
+        <SplitPane fx:id="historySplitPane" dividerPositions="0.65" orientation="VERTICAL" BorderPane.alignment="CENTER">
+            <items>
+                <VBox>
                     <children>
-                        <Label fx:id="branchLabel" styleClass="versioncontrol-branch-label">
-                            <graphic>
-                                <FontIcon iconLiteral="mdi2s-source-branch" iconSize="16" styleClass="toolbar-icon" />
-                            </graphic>
-                        </Label>
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="unpushedLabel" styleClass="versioncontrol-unpushed-label" />
+                        <HBox fx:id="branchBar" alignment="CENTER_LEFT" spacing="8.0" styleClass="versioncontrol-branch-bar">
+                            <children>
+                                <Label fx:id="branchLabel" styleClass="versioncontrol-branch-label">
+                                    <graphic>
+                                        <FontIcon iconLiteral="mdi2s-source-branch" iconSize="16" styleClass="toolbar-icon" />
+                                    </graphic>
+                                </Label>
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label fx:id="unpushedLabel" styleClass="versioncontrol-unpushed-label" />
+                            </children>
+                            <padding>
+                                <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
+                            </padding>
+                        </HBox>
+                        <StackPane VBox.vgrow="ALWAYS">
+                            <children>
+                                <TreeView fx:id="changesTree" showRoot="false" />
+                                <Label fx:id="noChangesLabel" mouseTransparent="true" styleClass="versioncontrol-placeholder" text="%versioncontrol_no_changes" />
+                            </children>
+                        </StackPane>
+                        <VBox spacing="6.0">
+                            <children>
+                                <TextArea fx:id="commitMessageField" prefRowCount="3" promptText="%versioncontrol_commit_message_prompt" wrapText="true" />
+                                <Button fx:id="commitButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#onCommit" styleClass="primary-button" text="%versioncontrol_commit">
+                                    <graphic>
+                                        <FontIcon iconLiteral="mdi2s-source-commit" iconSize="16" styleClass="button-icon" />
+                                    </graphic>
+                                </Button>
+                            </children>
+                            <padding>
+                                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                            </padding>
+                        </VBox>
                     </children>
-                    <padding>
-                        <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
-                    </padding>
-                </HBox>
-                <StackPane VBox.vgrow="ALWAYS">
-                    <children>
-                        <TreeView fx:id="changesTree" showRoot="true" />
-                        <Label fx:id="noChangesLabel" mouseTransparent="true" styleClass="versioncontrol-placeholder" text="%versioncontrol_no_changes" />
-                    </children>
-                </StackPane>
-            </children>
-        </VBox>
+                </VBox>
+                <fx:include fx:id="historyPanel" source="versioncontrol-history-panel.fxml" />
+            </items>
+        </SplitPane>
     </center>
-    <bottom>
-        <VBox spacing="6.0">
-            <children>
-                <TextArea fx:id="commitMessageField" prefRowCount="3" promptText="%versioncontrol_commit_message_prompt" wrapText="true" />
-                <Button fx:id="commitButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#onCommit" styleClass="primary-button" text="%versioncontrol_commit">
-                    <graphic>
-                        <FontIcon iconLiteral="mdi2s-source-commit" iconSize="16" styleClass="button-icon" />
-                    </graphic>
-                </Button>
-            </children>
-            <padding>
-                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-            </padding>
-        </VBox>
-    </bottom>
 </BorderPane>

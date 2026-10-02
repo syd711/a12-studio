@@ -56,7 +56,7 @@
         <children>
             <Button fx:id="deployModelBtn" disable="true" mnemonicParsing="false" onAction="#onDeployModel" styleClass="action-button">
                 <graphic>
-                    <FontIcon iconLiteral="mdi2c-cloud-upload-outline" iconSize="18" />
+                    <FontIcon iconLiteral="mdi2f-folder-upload" iconSize="18" />
                 </graphic>
                 <tooltip>
                     <Tooltip fx:id="deployModelBtnTooltip" text="%deploy_model" />

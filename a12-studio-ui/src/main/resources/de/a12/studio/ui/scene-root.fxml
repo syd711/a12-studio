@@ -8,6 +8,7 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
@@ -61,6 +62,15 @@
                                              </graphic>
                                              <tooltip>
                                                 <Tooltip text="%versioncontrol_tooltip" />
+                                             </tooltip>
+                                          </ToggleButton>
+                                          <Region VBox.vgrow="ALWAYS" />
+                                          <ToggleButton fx:id="versioncontrolHistoryToggle" styleClass="activity-bar-button" selected="true" visible="false" managed="false" mnemonicParsing="false" onAction="#onVersioncontrolHistoryToggle">
+                                             <graphic>
+                                                <FontIcon iconLiteral="mdi2h-history" iconSize="18" styleClass="toolbar-icon" />
+                                             </graphic>
+                                             <tooltip>
+                                                <Tooltip text="%versioncontrol_history_tooltip" />
                                              </tooltip>
                                           </ToggleButton>
                                        </items>

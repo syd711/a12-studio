@@ -190,6 +190,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
     rootTreeItem.setExpanded(true);
     projectTree.setRoot(rootTreeItem);
+    refreshGitChanges();
     JFXFuture.supplyAsync(()-> {
       Map<String, List<ModelValidationError>> errors = validateAllModels(project);
       return errors;
@@ -202,8 +203,55 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     });
   }
 
+  /** Absolute, normalized paths of the project's files with uncommitted git changes (new, modified, deleted). */
+  private volatile Set<String> changedPaths = Set.of();
+
+  private boolean hasOutgoingChanges(ProjectItemViewModel item) {
+    return changedPaths.contains(normalizedPath(item.getProjectItem().getPath()));
+  }
+
+  private static String normalizedPath(String path) {
+    return java.nio.file.Path.of(path).toAbsolutePath().normalize().toString();
+  }
+
+  /** Re-reads the git status off the FX thread and redraws the tree if the set of changed files differs. */
+  private void refreshGitChanges() {
+    Project currentProject = project;
+    var gitService = Studio.getGitService();
+    if (currentProject == null || gitService == null) {
+      if (!changedPaths.isEmpty()) {
+        changedPaths = Set.of();
+        projectTree.refresh();
+      }
+      return;
+    }
+    JFXFuture.supplyAsync(() -> {
+      try {
+        Set<String> paths = new HashSet<>();
+        for (var changed : gitService.getChangedProjectFiles(currentProject.getFolder())) {
+          paths.add(normalizedPath(changed.file().getAbsolutePath()));
+        }
+        return paths;
+      }
+      catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }).thenAcceptLater(paths -> {
+      if (this.project == currentProject && !paths.equals(changedPaths)) {
+        changedPaths = paths;
+        projectTree.refresh();
+      }
+    }).onErrorLater(ex -> log.warn("Failed to read git status for project tree", ex));
+  }
+
+  @Override
+  public void gitStatusChanged(@NonNull GitStatusChangedEvent event) {
+    refreshGitChanges();
+  }
+
   @Override
   public void modelSaved(@NonNull ModelSaveEvent event) {
+    refreshGitChanges();
     if (project == null || event.getItem().getModel() == null) {
       return;
     }
@@ -757,6 +805,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       }
     });
     AtomicReference<ProjectItemViewModel> dragSource = new AtomicReference<>();
-    projectTree.setCellFactory(treeView -> new ProjectTreeCell(this::openItem, menuFactory, contextMenuFactory, dragSource));
+    projectTree.setCellFactory(treeView -> new ProjectTreeCell(this::openItem, menuFactory, contextMenuFactory, dragSource,
+        this::hasOutgoingChanges));
   }
 }
