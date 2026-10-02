@@ -117,6 +117,7 @@ public class DataConfigurationPanelController implements Initializable {
     tree.getSelectionModel().selectedItemProperty()
         .addListener((obs, oldVal, newVal) -> showDetail(newVal == null ? null : newVal.getValue().element()));
     searchController.setOnSearch(term -> refreshTree());
+    searchController.installShortcut(tree);
 
     numberOfInitialRowsField.textProperty().addListener((obs, oldVal, newVal) -> {
       TreeItem<Row> selected = tree.getSelectionModel().getSelectedItem();

@@ -253,6 +253,7 @@ public class TypeDefinitionTableController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     searchController.setOnSearch(this::applyFilter);
+    searchController.installShortcut(typeDefinitionsTable);
     deleteImportButton.setDisable(true);
 
     typeDefinitionsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

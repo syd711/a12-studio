@@ -116,6 +116,7 @@ public class QueryModelTreeController implements Initializable {
     });
 
     searchController.setOnSearch(term -> rebuildTree());
+    searchController.installShortcut(elementsTreeTable);
   }
 
   public void load(@NonNull ProjectItem projectItem, @NonNull QueryModel model) {

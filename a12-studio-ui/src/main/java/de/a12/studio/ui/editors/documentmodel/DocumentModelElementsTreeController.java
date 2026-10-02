@@ -99,6 +99,9 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private CheckBox additiveElementsOnlyCheckBox;
 
   @FXML
+  private CheckBox hideIncludedFieldsCheckBox;
+
+  @FXML
   private Button undoButton;
 
   @FXML
@@ -518,6 +521,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     elementsTreeTable.setRoot(root);
     applyValidationState(root);
     expandAll(root);
+    // Reused rows/cells otherwise keep the indent and hover state of the tree they showed before the rebuild.
+    elementsTreeTable.refresh();
     updateFilterIndicators(narrowed && root.getChildren().isEmpty());
   }
 
@@ -635,10 +640,26 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private TreeItem<ElementViewModel> toTreeItem(@NonNull Element element) {
     ElementViewModel viewModel = new ElementViewModel(element, otherDocumentModels);
     TreeItem<ElementViewModel> treeItem = new TreeItem<>(viewModel);
+    if (hidesChildren(element)) {
+      return treeItem;
+    }
     for (ElementViewModel child : viewModel.getChildren()) {
       treeItem.getChildren().add(toTreeItem(child.getElement()));
     }
     return treeItem;
+  }
+
+  /**
+   * Whether {@code element} is an Include group whose included fields are currently hidden by
+   * {@link #hideIncludedFieldsCheckBox}. The synthetic base model node is Include-shaped but isn't one the user
+   * placed, so it is never collapsed by this.
+   */
+  private boolean hidesChildren(@NonNull Element element) {
+    return hideIncludedFieldsCheckBox.isSelected()
+        && !isBaseModelNode(element)
+        && element instanceof GroupElement group
+        && group.getGroup() != null
+        && group.getGroup().getIncludeConfig() != null;
   }
 
   /**
@@ -658,7 +679,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     }
 
     List<TreeItem<ElementViewModel>> matchingChildren = new ArrayList<>();
-    for (ElementViewModel child : viewModel.getChildren()) {
+    for (ElementViewModel child : hidesChildren(element) ? List.<ElementViewModel>of() : viewModel.getChildren()) {
       TreeItem<ElementViewModel> filteredChild = toFilteredTreeItem(child.getElement());
       if (filteredChild != null) {
         matchingChildren.add(filteredChild);
@@ -1215,7 +1236,9 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     updateEditingButtonsState();
     updateUndoRedoState();
     searchController.setOnSearch(this::applyFilter);
+    searchController.installShortcut(elementsTreeTable);
     additiveElementsOnlyCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> applyFilter(searchController.getText()));
+    hideIncludedFieldsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> applyFilter(searchController.getText()));
 
     elementsTreeTable.setShowRoot(true);
     elementsTreeTable.setPlaceholder(WidgetFactory.createDefaultLabel(EMPTY_TREE_PLACEHOLDER));

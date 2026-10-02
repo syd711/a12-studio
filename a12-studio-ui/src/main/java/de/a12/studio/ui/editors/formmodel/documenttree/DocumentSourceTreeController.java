@@ -89,6 +89,7 @@ public class DocumentSourceTreeController implements Initializable {
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     searchController.setOnSearch(this::applyFilter);
+    searchController.installShortcut(tree);
     tree.setShowRoot(false);
     tree.setCellFactory(view -> {
       FormSourceElementTreeCell cell = new FormSourceElementTreeCell(id -> marksById.get(id));

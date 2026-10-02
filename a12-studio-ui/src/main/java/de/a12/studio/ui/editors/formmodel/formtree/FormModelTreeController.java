@@ -369,7 +369,7 @@ public class FormModelTreeController implements Initializable {
     appendShortcutToTooltip(expandAllButton.getTooltip(), EXPAND_ALL_KEYS);
     appendShortcutToTooltip(collapseAllButton.getTooltip(), COLLAPSE_ALL_KEYS);
     // The search field is a shared component without a tooltip of its own, so the hint goes into its prompt text.
-    searchController.setPromptText(StudioBundle.get("search") + " (" + SEARCH_KEYS.getDisplayText() + ")");
+    searchController.setPromptText(StudioBundle.get("search"));
   }
 
   // Extends the tooltip declared in the FXML (already localized by the loader) instead of duplicating its text.

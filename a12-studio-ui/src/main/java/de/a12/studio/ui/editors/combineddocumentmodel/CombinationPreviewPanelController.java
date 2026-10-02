@@ -60,6 +60,7 @@ public class CombinationPreviewPanelController implements Initializable {
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     searchController.setOnSearch(this::applyFilter);
+    searchController.installShortcut(tree);
     tree.setShowRoot(false);
     tree.setCellFactory(view -> new CombinationPreviewElementTreeCell());
   }
