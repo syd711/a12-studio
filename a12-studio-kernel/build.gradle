@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+}
+
+// The only module allowed to import com.mgmtp.a12.kernel.* (see CLAUDE.md "Kernel access only through the
+// facade module"). The kernel is pinned to exactly 31.1.1: 30.8.x silently drops includeConfig and 31.1.3's
+// kernel-internal-* artifacts are not published. Do not use kernel-rewrite (Groovy 4 clash).
+dependencies {
+    // implementation, not api: no kernel type may leak into this module's public signatures.
+    implementation 'com.mgmtp.a12.kernel:kernel-md-facade:31.1.1'
+
+    testImplementation platform('org.junit:junit-bom:5.11.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}

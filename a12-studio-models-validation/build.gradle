@@ -1,5 +1,7 @@
 dependencies {
     implementation project(':a12-studio-models')
+    // Kernel access only through the facade module (CLAUDE.md); never the kernel artifacts directly.
+    implementation project(':a12-studio-kernel')
     implementation 'org.apache.commons:commons-lang3:3.16.0'
     implementation 'org.slf4j:slf4j-api:2.0.17'
 

@@ -37,7 +37,7 @@ uses for Document Model expansion and validation code (`a12-studio-ui/.../previe
 claimed a12-studio "pulls in the same kernel libraries directly" and listed specific coordinates as already present;
 that was never actually true (no such `build.gradle` entries exist in git history, and there is no
 `ValidationRuleService.java` in this repo). The kernel's Community-edition artifacts (e.g. `kernel-md-facade`,
-`kernel-md-model`) are in fact anonymously downloadable from `artifacts.geta12.com` — dual-licensed EUPL-1.2/commercial,
+`kernel-md-model`) are in fact anonymously downloadable from mgm's package registry (`gitlab.geta12.com`, formerly `artifacts.geta12.com`) — dual-licensed EUPL-1.2/commercial,
 same as this repo's own `LICENSE` — so an in-process kernel dependency is a legally and technically viable path, not
 a blocked one. But taking it is a real architectural decision (large transitive dependency footprint; turns
 a12-studio from an independent reimplementation into a kernel wrapper for whatever slice uses it), so it hasn't been
@@ -678,8 +678,8 @@ registration, data provider, reference provider for roles): the editor UI, the m
 in the external `@com.mgmtp.a12.print/print-typesetting` npm package, and the server-side check in
 `com.mgmtp.a12.print:print-typesetting` (`TypesettingModelValidator` = the kernel run over the
 `DomainTypesettingMetaModel`). Both are downloadable anonymously from the community repo
-(`https://artifacts.geta12.com/artifactory/a12-community-maven/com/mgmtp/a12/print/print-typesetting/<v>/print-typesetting-<v>-sources.jar`
-and `.../api/npm/a12-community-npm/@com.mgmtp.a12.print/print-typesetting/-/print-typesetting-<v>.tgz`; 3.2.3-4.0.1
+(`https://gitlab.geta12.com/api/v4/projects/1/packages/maven/com/mgmtp/a12/print/print-typesetting/<v>/print-typesetting-<v>-sources.jar`
+and `https://gitlab.geta12.com/api/v4/projects/1/packages/npm/@com.mgmtp.a12.print/print-typesetting/-/@com.mgmtp.a12.print/print-typesetting-<v>.tgz`; 3.2.3-4.0.1
 in the Maven repo, SME pins 3.2.1 which is not published). The npm package is the source of truth for the editor; the Java jar carries
 `models/DomainTypesettingMetaModel.json`, the kernel meta-model with the field limits and the roles rules.
 
@@ -871,7 +871,7 @@ SME's shared `RepeatBase` (`fmElements/types/detachedRepeat.ts`) has several fie
 (`includeId`/`formModelRef`/`hostDocumentModelPath`) and shows a "link" icon (`isIncluded()`). The expansion is a
 build-time batch, `FormModelExpansionBatchCLI` from `com.mgmtp.a12.formengine:formengine-model` (SME's Gradle task
 `resolveFormIncludes`, commit "A12SME-2367 Form Model Dev-Includes"), which rewrites the model files in place.
-**The library is published with sources** in the community repo (`artifacts.geta12.com/artifactory/a12-community-maven`,
+**The library is published with sources** in the community repo (`gitlab.geta12.com/api/v4/projects/1/packages/maven`,
 `com/mgmtp/a12/formengine/formengine-model/<version>/...-sources.jar`, 38.4.0–39.0.1 at the time; SME's own 38.3.0 is not
 there; EUPL-1.2/commercial), so the exact semantics of `IncludeExpansion`/`IncludeMapper` were read, not guessed. What it does:
 
@@ -1208,7 +1208,7 @@ covered by round-trip tests.**
 
 The earlier version was reverse-engineered from one golden fixture. The real generator is readable: npm
 `@com.mgmtp.a12.formengine/form-model-generator` 38.4.3 (`src/main/ts/generator/*`, anonymous download from
-`artifacts.geta12.com`, see the community-npm reference memory; SME's `fmmSupport.ts` imports it). `FormScreenGenerator`
+`gitlab.geta12.com`, see the community-npm reference memory; SME's `fmmSupport.ts` imports it). `FormScreenGenerator`
 now ports its behavior (clean-room, covered by `FormScreenGeneratorTest`):
 - deterministic ids from the Document Model element ids (`Screen_for_<id>`, `Section_for_`, `ControlGrid_for_`,
   `Row_for_`, `Control_for_`, `DetachedRepeat_for_`, `Column_for_`), no random suffixes;
@@ -2495,7 +2495,7 @@ The one place vendor JVM code runs is out of process, in the Preview App deploy 
 
 Time-boxed spike, no production code. A scratch Gradle project (outside the repo) resolved the kernel against the
 same repository a12-studio already configures in `settings.gradle`
-(`https://artifacts.geta12.com/artifactory/a12-community-maven/`, no credentials) and ran the four capabilities
+(at the time `https://artifacts.geta12.com/artifactory/a12-community-maven/`, no credentials; that Artifactory was retired in October 2026 and `settings.gradle` now points at `https://gitlab.geta12.com/api/v4/projects/1/packages/maven` as repository `mgm-gitlabel`, optional `a12User`/`a12Token`, anonymous access re-verified 2026-10-02) and ran the four capabilities
 in-process against the JSON fixtures under `testing/workspaces/{basic,advanced_new,e-commerce}` (53 Document
 Models with a `modelRoot`). Everything below was observed, not inferred from documentation, unless marked otherwise.
 
@@ -2514,7 +2514,7 @@ up to `31.1.1`. Pin `31.1.1` and re-check when `31.1.3`'s internals appear. In 3
 `kernel-md-model` and `kernel-md-join` no longer exist past 30.8.6 (the model classes are in
 `kernel-internal-md-model`, the join is inside `kernel-md-facade`), and `kernel-md-facade` alone pulls in the rest.
 
-**Footprint and conflicts (kernel 31.1.1, `kernel-md-facade` + `-documentmodel` + `-serializer`).** 72 jars,
+**Footprint and conflicts (kernel 31.1.1, `kernel-md-facade` alone; it pulls `kernel-md-documentmodel`, `kernel-md-serializer` and `kernel-md-document-v2` transitively, there are no `kernel-documentmodel`/`kernel-serializer` artifacts).** Re-resolved 2026-10-02 against the GitLab registry: unchanged, 72 jars,
 20.5 MB: 56 `com.mgmtp.a12.kernel` artifacts (including the `mm*` model-typing/validator ones), 2 `com.mgmtp.a12.base`, and
 four third-party artifacts new to the studio: Groovy 3.0.25, commons-cli, commons-text, jakarta.validation-api. The studio's `a12-studio-ui` runtime
 classpath has 50 artifacts, 11 of which overlap; none needs a code change, all resolve upward:
@@ -2543,7 +2543,7 @@ open every artifact). That is the same dual licence
 as this repo's `LICENSE` (EUPL-1.2), so linking is compatible if the EUPL option is chosen, and the notices must be
 shipped. Metadata is thin: the kernel POMs I checked have no `<licenses>` block and the `kernel-md-facade` CycloneDX SBOM declares a licence for only
 3 of 58 `com.mgmtp` components, which will show up as "undeclared" in `generateLicenses` output. **TDG is different:**
-no `com.mgmtp.a12.tdg` group exists in `a12-community-maven`, `a12-2026-06-community-maven` or
+(on the old Artifactory) no `com.mgmtp.a12.tdg` group exists in `a12-community-maven`, `a12-2026-06-community-maven` or
 `a12-2025-06-community-maven` (404), and `a12-enterprise-maven` / `a12-enterprise-plus-maven` return 401. TDG is a
 licensed product; use needs mgm credentials (`a12-license@mgm-tp.com`).
 
@@ -2582,9 +2582,11 @@ messages only.
 - **Stay clean-room** for everything already built (move/rename refactoring, the hand-ported structural validators) and
   for anything TDG-dependent until mgm access is sorted out. Rule contradiction and test-data generation are blocked,
   not merely unbuilt.
-- **Before committing:** ask mgm (`a12-license@mgm-tp.com`) whether depending on `a12internal`/`internal` classes from
-  a non-A12 component is acceptable and whether they will announce changes; that is a business decision and it decides
-  how much of the `internal` surface is safe to rely on.
+- **Built 2026-10-02:** module `a12-studio-kernel` (`KernelDocumentModelChecker` = public `checkConsistency`; `KernelDocumentModelExpander` = `ExpandingDmResolver` + `UnexpandedModelResolverImpl`, expands Document *and* Combination Models; locale must be `en_US`/`de_DE`), `ProjectKernelModels` in `a12-studio-models-validation` as the project adapter, the Combination Model Preview tab now kernel-backed with fallback. 8 contract tests in `KernelDocumentModelCheckerContractTest`.
+- **Decision (owner, 2026-10-02): go.** Rely on the kernel including its `internal`/`a12internal` surface, always behind
+  the facade module above; no answer from mgm is awaited (a courtesy note to `a12-license@mgm-tp.com` stays optional).
+  Breakage is handled at the next A12 major release by adjusting the facade, which is the only place that may import
+  `com.mgmtp.a12.kernel.*`. The contract tests are what makes such a break visible.
 
 **What it would unlock, ranked by value per effort:**
 

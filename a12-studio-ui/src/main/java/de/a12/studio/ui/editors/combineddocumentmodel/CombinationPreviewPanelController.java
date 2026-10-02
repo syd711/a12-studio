@@ -6,6 +6,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.kernel.ProjectKernelModels;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.ElementViewModel;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -26,12 +27,10 @@ import java.util.ResourceBundle;
 
 /**
  * The "Preview" tab of the Combination Model editor: a read-only tree of the merged Document Model this
- * Combination Model produces, built by {@link CombinedDocumentModelElements#resolveForFieldReferences} (the
- * same approximate, kernel-free join every field-reference picker already resolves against - see that
- * class's own javadoc for what it does and does not apply: Addition steps only, in order; Selection/Decoration
- * steps are not reflected here either, for the same reason). This is the "scoped slice... buildable today
- * without the kernel dependency" the doc's Combined Document Model section called for, not the real
- * kernel-backed expand/merge preview SME has.
+ * Combination Model produces, expanded by the A12 kernel through {@link ProjectKernelModels#expand} (the real
+ * join, as SME shows it). If the kernel cannot expand the model, it falls back to {@link
+ * CombinedDocumentModelElements#resolveForFieldReferences}, the approximate kernel-free join every
+ * field-reference picker resolves against (Addition steps only, in order).
  *
  * <p>Closely mirrors {@code formmodel.documenttree.DocumentSourceTreeController} (read-only Document Model
  * tree, search filter, expand/collapse) minus its drag-and-drop (nothing to drop this onto) and "open
@@ -67,7 +66,10 @@ public class CombinationPreviewPanelController implements Initializable {
 
   public void load(@NonNull CombinedDocumentModel model, @NonNull ProjectItem projectItem) {
     this.projectItem = projectItem;
-    this.mergedModel = CombinedDocumentModelElements.resolveForFieldReferences(projectItem, model.getId());
+    // The kernel does the real join (additions, selections, decorations); the approximate Addition-only merge is
+    // the fallback for whatever the kernel cannot expand (e.g. a half-edited model with an unset base).
+    this.mergedModel = ProjectKernelModels.expand(projectItem, model.getId())
+        .orElseGet(() -> CombinedDocumentModelElements.resolveForFieldReferences(projectItem, model.getId()));
     this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem);
     refresh();
   }

@@ -5,6 +5,7 @@ include 'a12-studio-ui'
 include 'a12-studio-server'
 include 'a12-studio-models'
 include 'a12-studio-models-validation'
+include 'a12-studio-kernel'
 include 'a12-studio-data-services'
 include 'a12-studio-plugins:create-from-access'
 include 'a12-studio-plugins:create-from-excel'
@@ -17,8 +18,8 @@ dependencyResolutionManagement {
         exclusiveContent {
             forRepository {
                 maven {
-                    name "mgmart"
-                    url 'https://artifacts.geta12.com/artifactory/a12-community-maven/'
+                    name "mgm-gitlabel"
+                    url 'https://gitlab.geta12.com/api/v4/projects/1/packages/maven'
                     credentials {
                         username = providers.gradleProperty("a12User").getOrElse(System.getenv("A12_USER") ?: "")
                         password = providers.gradleProperty("a12Token").getOrElse(System.getenv("A12_TOKEN") ?: "")
