@@ -46,7 +46,7 @@ public class FXResizeHelper {
 
   // tracks how the stage's geometry was last set, so keyboard/mouse maximize, snap, and
   // restore actions agree on where "restore" should return the stage to
-  private enum WindowState { NORMAL, MAXIMIZED }
+  private enum WindowState { NORMAL, MAXIMIZED, SNAPPED_LEFT, SNAPPED_RIGHT }
 
   private WindowState windowState = WindowState.NORMAL;
 
@@ -196,6 +196,35 @@ public class FXResizeHelper {
     STAGE.setWidth(bounds.getWidth());
     STAGE.setHeight(bounds.getHeight());
     windowState = WindowState.MAXIMIZED;
+  }
+
+  /**
+   * Snaps the stage to the left half of the current screen, mirroring the OS Win+Left shortcut.
+   */
+  public void snapLeft() {
+    snap(true);
+  }
+
+  /**
+   * Snaps the stage to the right half of the current screen, mirroring the OS Win+Right shortcut.
+   */
+  public void snapRight() {
+    snap(false);
+  }
+
+  private void snap(boolean left) {
+    storeNormalGeometry();
+
+    Rectangle2D bounds = getScreen(STAGE).getVisualBounds();
+    // the stage can't shrink below its min width, so on screens where a true half would be
+    // narrower than that, fall back to the min width and keep the window flush with its edge
+    double width = Math.min(Math.max(bounds.getWidth() / 2, STAGE.getMinWidth()), bounds.getWidth());
+
+    STAGE.setY(bounds.getMinY());
+    STAGE.setHeight(bounds.getHeight());
+    STAGE.setWidth(width);
+    STAGE.setX(left ? bounds.getMinX() : bounds.getMaxX() - width);
+    windowState = left ? WindowState.SNAPPED_LEFT : WindowState.SNAPPED_RIGHT;
   }
 
   /**

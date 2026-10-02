@@ -109,3 +109,32 @@
 .completion-label {
     -fx-text-fill: -fx-text-color;
 }
+
+.hover-doc {
+    -fx-background-color: -fx-input-bg;
+    -fx-border-color: -fx-border-input;
+    -fx-border-width: 1px;
+    -fx-padding: 8px;
+    -fx-spacing: 4px;
+}
+
+.hover-doc .hover-doc-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 1.1em;
+    -fx-text-fill: -fx-text-color;
+}
+
+.hover-doc .hover-doc-text {
+    -fx-text-fill: -fx-text-color;
+}
+
+.hover-doc .hover-doc-heading {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+    -fx-padding: 4px 0 0 0;
+}
+
+.hover-doc .hover-doc-code {
+    -fx-font-family: "Consolas", "Monospaced";
+    -fx-text-fill: -fx-text-color;
+}

@@ -62,7 +62,7 @@ Nothing open.
 - **[OWNER] Kernel-backed preview:** the new Preview tab shows only the addition-only merge (`CombinedDocumentModelElements.resolveForFieldReferences`). Selection/Decoration steps and real semantic join are not reflected - needs Open Decision #1.
 
 ### Query Model
-- Filter completion (`QueryFilterCompletion`/`QueryFilterSuggestionProvider`) is not looked at on a display. Not ported from SME's qmm editor: inlay hints, hover docs, call-stack breadcrumb.
+- Filter completion (`QueryFilterCompletion`/`QueryFilterSuggestionProvider`) is not looked at on a display. Hover docs (`QueryFilterHover`/`QueryFilterHoverProvider`, popup in `RuleEditorController`) are ported but, like completion, not looked at on a display. Not ported from SME's qmm editor: inlay hints, call-stack breadcrumb.
 - **[LOCAL] Wire shape of Query `aggregation` and of a `Has(...)` call inside `filterDefinition`** never checked against a real SME file (see Blocked). Re-swept 2026-10-02: neither the repo fixtures nor the A12 2026.06 sample workspaces contain one; still unverifiable.
 - Note: the Model Tree tab's root DM is picked in the Settings tab, not through an ER-diagram picker like SME (by design).
 

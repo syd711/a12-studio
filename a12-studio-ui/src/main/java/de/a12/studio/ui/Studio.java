@@ -57,6 +57,7 @@ public class Studio extends Application implements StudioEventListener {
   private static Project currentProject;
   private static ValidationService validationService;
   private static GitService gitService;
+  private static WindowsSnapHook windowsSnapHook;
 
   @Override
   public void start(Stage stage) throws IOException {
@@ -157,6 +158,12 @@ public class Studio extends Application implements StudioEventListener {
 
           StudioTray.install();
 
+          // Win+Left/Right are reserved by the Windows shell's own Snap Assist ahead of normal window
+          // messages, so a plain JavaFX key listener never sees them (unlike Win+Up/Down, which
+          // StudioKeyEventHandler already handles as a fallback). This hook intercepts them earlier.
+          windowsSnapHook = new WindowsSnapHook(key -> Platform.runLater(() -> handleWindowsSnapKey(key)));
+          windowsSnapHook.install();
+
           Platform.runLater(Studio::checkA12InstallationFolder);
         })
         .onErrorLater(ex -> log.error("Failed to start Studio: {}", ex.getMessage(), ex));
@@ -203,8 +210,23 @@ public class Studio extends Application implements StudioEventListener {
     }
   }
 
+  private static void handleWindowsSnapKey(WindowsSnapHook.SnapKey key) {
+    if (!(stage.getUserData() instanceof FXResizeHelper helper)) {
+      return;
+    }
+    switch (key) {
+      case LEFT -> helper.snapLeft();
+      case RIGHT -> helper.snapRight();
+      case UP -> helper.maximize();
+      case DOWN -> helper.restoreOrMinimize();
+    }
+  }
+
   @Override
   public void stop() {
+    if (windowsSnapHook != null) {
+      windowsSnapHook.uninstall();
+    }
     StudioTray.uninstall();
     PreviewServer.stopIfRunning();
     SmeBackend.getInstance().stop();

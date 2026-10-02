@@ -59,7 +59,7 @@ public final class QueryFilterCompletion {
 
   private static final String CARET = "$0";
 
-  private static final Map<String, String> OPERATOR_RAW = Map.of(
+  static final Map<String, String> OPERATOR_RAW = Map.of(
       "Equal", "==", "NotEqual", "!=", "SingleMatch", "~", "NotSingleMatch", "!~",
       "GreaterThanOrEqual", ">=", "LessThanOrEqual", "<=");
 
@@ -303,7 +303,7 @@ public final class QueryFilterCompletion {
   // ---- token context ----
 
   /** An unclosed {@code (}: the callee in front of it (null for a plain group) and where its arguments start. */
-  private static final class Frame {
+  static final class Frame {
 
     final String callee;
     final List<Integer> argStarts = new ArrayList<>();
@@ -314,7 +314,7 @@ public final class QueryFilterCompletion {
     }
   }
 
-  private static List<Frame> frames(List<Token> tokens) {
+  static List<Frame> frames(List<Token> tokens) {
     List<Frame> stack = new ArrayList<>();
     for (int i = 0; i < tokens.size(); i++) {
       Token token = tokens.get(i);
@@ -341,7 +341,7 @@ public final class QueryFilterCompletion {
   }
 
   /** The text of argument {@code index} of {@code call} if it is exactly one string literal, else null. */
-  private static String stringArgument(List<Token> tokens, Frame call, int index) {
+  static String stringArgument(List<Token> tokens, Frame call, int index) {
     int start = call.argStarts.get(index);
     int end = index + 1 < call.argStarts.size() ? call.argStarts.get(index + 1) - 1 : tokens.size();
     if (end - start != 1 || tokens.get(start).getType() != QLLexer.STRING_LITERAL) {
@@ -353,7 +353,7 @@ public final class QueryFilterCompletion {
 
   /** The Document Model the caret's expression is evaluated against: the root's, or - inside the constraint
    * arguments of enclosing {@code Has(...)} calls - the role's / the link's. */
-  private DocumentModel scope(List<Frame> frames, List<Token> tokens, DocumentModel root) {
+  DocumentModel scope(List<Frame> frames, List<Token> tokens, DocumentModel root) {
     DocumentModel scope = root;
     for (Frame frame : frames) {
       if (!"Has".equals(frame.callee)) {
@@ -377,7 +377,7 @@ public final class QueryFilterCompletion {
     return scope;
   }
 
-  private FieldInfo fieldInfo(String fieldToken, DocumentModel scope) {
+  FieldInfo fieldInfo(String fieldToken, DocumentModel scope) {
     if (scope == null || scope.getContent() == null || scope.getContent().getModelRoot() == null
         || fieldToken.length() < 2) {
       return null;
@@ -390,7 +390,7 @@ public final class QueryFilterCompletion {
   // ---- lexing ----
 
   /** The tokens of {@code source} on the default channel, whitespace already skipped by the lexer. */
-  private static List<Token> lex(String source) {
+  static List<Token> lex(String source) {
     QLLexer lexer = new QLLexer(CharStreams.fromString(source));
     lexer.removeErrorListeners();
     List<Token> tokens = new ArrayList<>(lexer.getAllTokens());

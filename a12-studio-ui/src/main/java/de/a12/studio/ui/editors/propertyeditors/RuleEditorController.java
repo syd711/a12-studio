@@ -6,6 +6,7 @@ import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -16,6 +17,7 @@ import javafx.util.Duration;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.richtext.event.MouseOverTextEvent;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.fxmisc.wellbehaved.event.InputMap;
@@ -62,6 +64,9 @@ public class RuleEditorController extends AbstractPropertyEditor implements Init
   // commit point, so without this every single character saved the panel's owner to disk (see AbstractPropertyEditor
   // #commitChange) and re-ran validator, which can be expensive (e.g. FilterItemDialogController's QL grammar
   // check) and was visibly janky while typing quickly.
+  private static final long HOVER_DELAY_MILLIS = 400;
+  private static final double HOVER_OFFSET = 10;
+
   private static final Duration SAVE_DEBOUNCE = Duration.millis(100);
 
   @FXML
@@ -72,6 +77,8 @@ public class RuleEditorController extends AbstractPropertyEditor implements Init
   private final Popup completionPopup = new Popup();
 
   private final ListView<Suggestion> completionList = new ListView<>();
+
+  private final Popup hoverPopup = new Popup();
 
   private final PauseTransition saveDebounce = new PauseTransition(SAVE_DEBOUNCE);
 
@@ -84,6 +91,12 @@ public class RuleEditorController extends AbstractPropertyEditor implements Init
   // Optional; supplies field/path autocomplete proposals for the current caret position (see Suggestion,
   // SuggestionProvider). Left unset for fields with no known field-tree context to suggest from.
   private SuggestionProvider suggestionProvider;
+
+  // Optional; supplies the documentation shown in a popup while the mouse rests on a token (see
+  // HoverProvider). Left unset for fields with no hover documentation.
+  private HoverProvider hoverProvider;
+
+  private boolean hoverInitialized;
 
   // Optional; matches whole-word occurrences of a fixed vocabulary (e.g. RuleLanguageConstructs.NAMES) to
   // highlight as keywords, in addition to computeHighlighting's built-in string-literal highlighting. Left
@@ -184,6 +197,48 @@ public class RuleEditorController extends AbstractPropertyEditor implements Init
    */
   public void setSuggestionProvider(@NonNull SuggestionProvider provider) {
     this.suggestionProvider = provider;
+  }
+
+  /**
+   * Enables hover documentation: while the mouse rests on a character of the text, {@code provider} is asked for
+   * the content of a popup describing the token there (SME shows the same on its Monaco editors). Optional; left
+   * unset, this editor shows no hover popup.
+   */
+  public void setHoverProvider(@NonNull HoverProvider provider) {
+    this.hoverProvider = provider;
+    if (!hoverInitialized) {
+      hoverInitialized = true;
+      initHoverPopup();
+    }
+  }
+
+  private void initHoverPopup() {
+    hoverPopup.setAutoHide(true);
+    codeArea.setMouseOverTextDelay(java.time.Duration.ofMillis(HOVER_DELAY_MILLIS));
+    codeArea.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_BEGIN, event -> {
+      if (hoverProvider == null || completionPopup.isShowing()) {
+        return;
+      }
+      Optional<Node> content = hoverProvider.hover(codeArea.getText(), event.getCharacterIndex());
+      if (content.isEmpty()) {
+        hoverPopup.hide();
+        return;
+      }
+      // Like completionList: a Popup's scene does not inherit this panel's stylesheets.
+      content.get().getStyleClass().add("hover-doc");
+      StackPane wrapper = new StackPane(content.get());
+      wrapper.getStylesheets().add(getClass().getResource("/de/a12/studio/ui/stylesheet.css").toExternalForm());
+      hoverPopup.getContent().setAll(wrapper);
+      hoverPopup.show(codeArea, event.getScreenPosition().getX() + HOVER_OFFSET,
+          event.getScreenPosition().getY() + HOVER_OFFSET);
+    });
+    codeArea.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_END, event -> hoverPopup.hide());
+    codeArea.textProperty().addListener((observable, oldValue, newValue) -> hoverPopup.hide());
+    codeArea.focusedProperty().addListener((observable, oldValue, focused) -> {
+      if (!focused) {
+        hoverPopup.hide();
+      }
+    });
   }
 
   /**

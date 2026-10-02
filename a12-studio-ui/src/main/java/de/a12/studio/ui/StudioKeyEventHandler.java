@@ -11,6 +11,7 @@ import de.a12.studio.ui.previewapp.PreviewAppDeployer;
 import de.a12.studio.ui.updater.Dialogs;
 import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.JFXFuture;
+import de.a12.studio.ui.util.OSUtil;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.StudioVersion;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Global keyboard shortcuts for the main studio window: saving the active model, toggling the
@@ -45,7 +47,7 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
    * Category#GENERAL} shortcuts work regardless of which (if any) tab is active; {@link
    * Category#EDITOR} shortcuts act on the currently active workarea tab.
    */
-  public static final List<Shortcut> SHORTCUTS = List.of(
+  public static final List<Shortcut> SHORTCUTS = Stream.concat(Stream.of(
       // --- General ---
       new Shortcut(StudioBundle.get("ctrl_n"), StudioBundle.get("new_project"), Category.GENERAL),
       new Shortcut(StudioBundle.get("ctrl_o"), StudioBundle.get("open_project"), Category.GENERAL),
@@ -63,8 +65,6 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       new Shortcut(StudioBundle.get("ctrl_alt_w"), StudioBundle.get("resize_window_to_2560x1440"), Category.GENERAL),
       new Shortcut(StudioBundle.get("ctrl_plus"), StudioBundle.get("increase_the_font_size"), Category.GENERAL),
       new Shortcut(StudioBundle.get("ctrl_minus"), StudioBundle.get("decrease_the_font_size"), Category.GENERAL),
-      new Shortcut(StudioBundle.get("win_up"), StudioBundle.get("maximize_the_window"), Category.GENERAL),
-      new Shortcut(StudioBundle.get("win_down"), StudioBundle.get("restore_then_minimize_the_window"), Category.GENERAL),
 
       // --- Editor (acts on the active workarea tab) ---
       new Shortcut(StudioBundle.get("ctrl_b"), StudioBundle.get("toggle_the_bookmark_state_of_the_active_tab"), Category.EDITOR),
@@ -77,7 +77,21 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       new Shortcut(StudioBundle.get("ctrl_tab"), StudioBundle.get("select_the_next_tab"), Category.EDITOR),
       new Shortcut(StudioBundle.get("ctrl_shift_tab"), StudioBundle.get("select_the_previous_tab"), Category.EDITOR),
       new Shortcut(StudioBundle.get("shift_f4"), StudioBundle.get("open_the_selected_tab_in_a_new_window"), Category.EDITOR)
-  );
+  ), windowSnapShortcuts()).toList();
+
+  /**
+   * The window snap shortcuts, using the platform's own modifier: Win+Arrow on Windows,
+   * Super+Arrow on Linux and Ctrl+Option+Arrow on macOS (Cmd+Arrow is taken by text navigation).
+   */
+  private static Stream<Shortcut> windowSnapShortcuts() {
+    String prefix = OSUtil.isWindows() ? "win_" : OSUtil.isMac() ? "mac_snap_" : "super_";
+    return Stream.of(
+      new Shortcut(StudioBundle.get(prefix + "left"), StudioBundle.get("snap_window_to_the_left_half_of_the_screen"), Category.GENERAL),
+      new Shortcut(StudioBundle.get(prefix + "right"), StudioBundle.get("snap_window_to_the_right_half_of_the_screen"), Category.GENERAL),
+      new Shortcut(StudioBundle.get(prefix + "up"), StudioBundle.get("maximize_the_window"), Category.GENERAL),
+      new Shortcut(StudioBundle.get(prefix + "down"), StudioBundle.get("restore_then_minimize_the_window"), Category.GENERAL)
+    );
+  }
 
   private final Stage stage;
 
@@ -108,7 +122,7 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       return;
     }
 
-    if (windowsKeyDown && handleWindowsArrowShortcut(ke)) {
+    if (isWindowSnapModifierDown(ke) && handleWindowsArrowShortcut(ke)) {
       return;
     }
 
@@ -237,13 +251,17 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
         : ke.getCode() == KeyCode.MINUS || ke.getCode() == KeyCode.SUBTRACT;
   }
 
+  /** Win on Windows, Ctrl+Option on macOS, Super on Linux (reported as the Windows key or as Meta). */
+  private boolean isWindowSnapModifierDown(KeyEvent ke) {
+    if (OSUtil.isMac()) {
+      return ke.isControlDown() && ke.isAltDown() && !ke.isShiftDown() && !ke.isMetaDown();
+    }
+    return windowsKeyDown || (OSUtil.isLinux() && ke.isMetaDown());
+  }
+
   /**
-   * Handles Win+Up/Down the same way a regular (decorated) Windows app would via Aero Snap.
-   * Win+Left/Right are reserved by the Windows shell's own Snap Assist ahead of normal window
-   * messages, so a plain JavaFX key listener never sees them - there is no non-hook way to
-   * intercept them, so that pair of shortcuts was dropped rather than reintroducing the global
-   * low-level keyboard hook this used to rely on. Returns true if the key was handled and
-   * consumed.
+   * Handles Win+Left/Right/Up/Down the same way a regular (decorated) Windows app would via
+   * Aero Snap. Returns true if the key was handled and consumed.
    */
   private boolean handleWindowsArrowShortcut(KeyEvent ke) {
     if (!(stage.getUserData() instanceof FXResizeHelper helper)) {
@@ -253,6 +271,8 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
     // Windows sometimes drops the extended-key flag on Win+Arrow combos, which makes the OS
     // report the dedicated arrow keys as their numpad (KP_*) equivalents instead - handle both.
     switch (ke.getCode()) {
+      case LEFT, KP_LEFT -> helper.snapLeft();
+      case RIGHT, KP_RIGHT -> helper.snapRight();
       case UP, KP_UP -> helper.maximize();
       case DOWN, KP_DOWN -> helper.restoreOrMinimize();
       default -> {

@@ -96,6 +96,7 @@ public class QueryDocumentNodePanelController {
       filterDefinitionPanelController.setSuggestionProvider(new QueryFilterSuggestionProvider(
           new BracketedPathSuggestionProvider(new ElementIndex(targetDocumentModel)),
           new QueryFilterCompletion(projectModels), targetDocumentModel));
+      filterDefinitionPanelController.setHoverProvider(new QueryFilterHoverProvider(projectModels, targetDocumentModel));
     }
     filterDefinitionPanelController.setCustom(node::getFilterDefinition, value -> {
       node.setFilterDefinition(value);
