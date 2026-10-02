@@ -1,0 +1,218 @@
+{
+ "_comment": "Recorded 2026-10-02 from the installed SME 13.0.2 backend: POST /api/document-model/validation-rule/validate-condition, /format-condition and /api/document-model/computation-rule/validate against its own expansion of Invoice_DM (basic workspace). Each case mutates the model at the given element before the call; line/startCol/endCol are exactly what SME returned.",
+ "rule": "include_7c34e_rule_73456",
+ "computation": "include_7c34e_computation_c89c3",
+ "conditions": [
+  {
+   "name": "valid",
+   "condition": null,
+   "errors": []
+  },
+  {
+   "name": "nonsense",
+   "condition": "nonsense nonsense",
+   "errors": [
+    {
+     "line": 1,
+     "startCol": 0,
+     "endCol": 8,
+     "message": "Corrupt input or condition not complete (yet): Unexpected found 'nonsense'. [MVK_UNEXPECTED_TOKEN]"
+    }
+   ]
+  },
+  {
+   "name": "unknownField",
+   "condition": "FieldsNotCollectivelyFilled(FirstName, Unknown)",
+   "errors": [
+    {
+     "line": 1,
+     "startCol": 39,
+     "endCol": 46,
+     "message": "The group or field 'Unknown' is not valid. [MVK_INVALID_ENTITY]"
+    }
+   ]
+  },
+  {
+   "name": "multiline",
+   "condition": "FieldsNotCollectivelyFilled(FirstName,\n  LastName) and nonsense",
+   "errors": [
+    {
+     "line": 2,
+     "startCol": 16,
+     "endCol": 24,
+     "message": "Corrupt input or condition not complete (yet): Unexpected found 'nonsense'. [MVK_UNEXPECTED_TOKEN]"
+    }
+   ]
+  },
+  {
+   "name": "unclosed",
+   "condition": "FieldsNotCollectivelyFilled(FirstName, LastName",
+   "errors": [
+    {
+     "line": 1,
+     "startCol": 47,
+     "endCol": 47,
+     "message": "Corrupt input or condition not complete (yet): Expected ')'. [MVK_EXPECTED_TOKEN_NOT_FOUND]"
+    }
+   ]
+  },
+  {
+   "name": "dangling",
+   "condition": "FieldNotFilled(FirstName) and",
+   "errors": [
+    {
+     "line": 1,
+     "startCol": 29,
+     "endCol": 29,
+     "message": "The condition is not complete (yet). [MVK_INCOMPLETE_INPUT]"
+    }
+   ]
+  },
+  {
+   "name": "empty",
+   "condition": "",
+   "errors": [
+    {
+     "line": 1,
+     "startCol": 0,
+     "endCol": 0,
+     "message": "The condition is not complete (yet). [MVK_INCOMPLETE_INPUT]"
+    }
+   ]
+  }
+ ],
+ "computations": [
+  {
+   "name": "valid",
+   "alternative": null,
+   "part": null,
+   "text": null,
+   "result": {
+    "semanticErrors": [],
+    "errors": []
+   }
+  },
+  {
+   "name": "opDangling",
+   "alternative": 0,
+   "part": "operation",
+   "text": "[FirstName] +",
+   "result": {
+    "semanticErrors": [],
+    "errors": [
+     {
+      "conditionType": "operation",
+      "alternativeIndex": 0,
+      "line": 1,
+      "startCol": 13,
+      "endCol": 13,
+      "message": "The condition is not complete (yet). [MVK_INCOMPLETE_INPUT]"
+     }
+    ]
+   }
+  },
+  {
+   "name": "preUnclosed",
+   "alternative": 1,
+   "part": "precondition",
+   "text": "AllFieldsFilled(FirstName,",
+   "result": {
+    "semanticErrors": [],
+    "errors": [
+     {
+      "conditionType": "precondition",
+      "alternativeIndex": 1,
+      "line": 1,
+      "startCol": 26,
+      "endCol": 26,
+      "message": "The condition is not complete (yet). [MVK_INCOMPLETE_INPUT]"
+     }
+    ]
+   }
+  },
+  {
+   "name": "opUnknownField",
+   "alternative": 2,
+   "part": "operation",
+   "text": "[Unknown]",
+   "result": {
+    "semanticErrors": [],
+    "errors": [
+     {
+      "conditionType": "operation",
+      "alternativeIndex": 2,
+      "line": 1,
+      "startCol": 1,
+      "endCol": 8,
+      "message": "The group or field 'Unknown' is not valid. [MVK_INVALID_ENTITY]"
+     }
+    ]
+   }
+  },
+  {
+   "name": "preNonsense",
+   "alternative": 0,
+   "part": "precondition",
+   "text": "nonsense nonsense",
+   "result": {
+    "semanticErrors": [],
+    "errors": [
+     {
+      "conditionType": "precondition",
+      "alternativeIndex": 0,
+      "line": 1,
+      "startCol": 0,
+      "endCol": 8,
+      "message": "Corrupt input or condition not complete (yet): Unexpected found 'nonsense'. [MVK_UNEXPECTED_TOKEN]"
+     }
+    ]
+   }
+  },
+  {
+   "name": "opMultiline",
+   "alternative": 1,
+   "part": "operation",
+   "text": "[FirstName] +\n  [LastName] +\n  nonsense",
+   "result": {
+    "semanticErrors": [],
+    "errors": [
+     {
+      "conditionType": "operation",
+      "alternativeIndex": 1,
+      "line": 3,
+      "startCol": 2,
+      "endCol": 10,
+      "message": "Corrupt input or condition not complete (yet): Unexpected found 'nonsense'. [MVK_UNEXPECTED_TOKEN]"
+     }
+    ]
+   }
+  }
+ ],
+ "formats": [
+  {
+   "name": "messy",
+   "condition": "FieldNotFilled(FirstName)   and   FieldNotFilled(LastName)",
+   "formatted": "FieldNotFilled(FirstName)\nAnd FieldNotFilled(LastName)"
+  },
+  {
+   "name": "lowercase",
+   "condition": "fieldnotfilled(FirstName) AND fieldnotfilled(LastName)",
+   "formatted": "fieldnotfilled(FirstName) AND fieldnotfilled(LastName)"
+  },
+  {
+   "name": "canonical",
+   "condition": null,
+   "formatted": "FieldsNotCollectivelyFilled(FirstName, LastName)"
+  },
+  {
+   "name": "broken",
+   "condition": "nonsense nonsense",
+   "formatted": "nonsense nonsense"
+  },
+  {
+   "name": "multiline",
+   "condition": "FieldNotFilled(FirstName)\n   and\n  FieldNotFilled(LastName)",
+   "formatted": "FieldNotFilled(FirstName)\nAnd FieldNotFilled(LastName)"
+  }
+ ]
+}
