@@ -7,6 +7,7 @@ import de.a12.studio.models.querymodel.ql.QueryLanguageEmitter;
 import de.a12.studio.models.querymodel.ql.QueryLanguageException;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.query.QueryFilterCompletion;
 import de.a12.studio.modelsvalidation.validators.query.QueryFilterReferenceChecker;
 import de.a12.studio.ui.editors.propertyeditors.BracketedPathSuggestionProvider;
 import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
@@ -85,13 +86,16 @@ public class QueryDocumentNodePanelController {
     // provider's index below: the validator runs (debounced) on every keystroke, and collecting the project's
     // models is a tree walk. Must be in place before setCustom, which validates the initial value.
     scopeModel = targetDocumentModel;
-    referenceChecker = new QueryFilterReferenceChecker(new QueryFilterReferenceChecker.Models(
+    QueryFilterReferenceChecker.Models projectModels = new QueryFilterReferenceChecker.Models(
         ProjectDocumentModels.getOtherDocumentModels(projectItem),
         ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.RELATIONSHIP).stream()
-            .filter(RelationshipModel.class::isInstance).map(RelationshipModel.class::cast).toList()));
+            .filter(RelationshipModel.class::isInstance).map(RelationshipModel.class::cast).toList());
+    referenceChecker = new QueryFilterReferenceChecker(projectModels);
 
     if (targetDocumentModel != null) {
-      filterDefinitionPanelController.setSuggestionProvider(new BracketedPathSuggestionProvider(new ElementIndex(targetDocumentModel)));
+      filterDefinitionPanelController.setSuggestionProvider(new QueryFilterSuggestionProvider(
+          new BracketedPathSuggestionProvider(new ElementIndex(targetDocumentModel)),
+          new QueryFilterCompletion(projectModels), targetDocumentModel));
     }
     filterDefinitionPanelController.setCustom(node::getFilterDefinition, value -> {
       node.setFilterDefinition(value);

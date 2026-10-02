@@ -269,7 +269,7 @@ public final class QueryFilterTypeChecker {
     return indexes.computeIfAbsent(model.getId(), id -> new ElementIndex(model, models.documentModels()));
   }
 
-  private static FieldInfo fieldInfo(ElementIndex index, FieldElement element) {
+  static FieldInfo fieldInfo(ElementIndex index, FieldElement element) {
     FieldType type = element.getField() == null ? null : index.effectiveFieldType(element.getField().getFieldType());
     return switch (type) {
       case BooleanFieldType t -> new FieldInfo("BooleanType", null, null);

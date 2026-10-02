@@ -34,7 +34,7 @@ class ProjectTreeContextMenu {
     ProjectItem projectItem = viewModel.getProjectItem();
 
     Menu newMenu = new Menu(StudioBundle.get("new"));
-    for (ModelType modelType : ModelType.values()) {
+    for (ModelType modelType : ModelTypeLabels.sortedByDisplayName()) {
       if (modelType == ModelType.DOCUMENT) {
         // Replace the plain Document Model entry with a submenu that offers additional import options.
         Menu documentMenu = new Menu(ModelTypeLabels.getDisplayName(modelType));
@@ -126,8 +126,12 @@ class ProjectTreeContextMenu {
     delete.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
     delete.setOnAction(event -> actions.onDeleteItem(projectItem));
 
+    // The item is hidden for folders; its trailing separator would then sit right next to the one before it.
+    SeparatorMenuItem afterOpenInNewWindow = new SeparatorMenuItem();
+    afterOpenInNewWindow.setVisible(!viewModel.isFolder());
+
     return new ContextMenu(newMenu, open, openInFileManager,
-        bookmark, rename, createCopy, new SeparatorMenuItem(), openInNewWindow, new SeparatorMenuItem(), zipFolder, delete);
+        bookmark, rename, createCopy, new SeparatorMenuItem(), openInNewWindow, afterOpenInNewWindow, zipFolder, delete);
   }
 
   /**

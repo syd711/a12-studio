@@ -309,7 +309,9 @@ public class RuleEditorController extends AbstractPropertyEditor implements Init
     if (currentCompletion == null) {
       return;
     }
-    codeArea.replaceText(currentCompletion.replaceStart(), currentCompletion.replaceEnd(), suggestion.insertText());
+    int start = currentCompletion.replaceStart();
+    codeArea.replaceText(start, currentCompletion.replaceEnd(), suggestion.insertText());
+    codeArea.moveTo(start + suggestion.insertText().length() - suggestion.caretFromEnd());
     hideCompletions();
   }
 

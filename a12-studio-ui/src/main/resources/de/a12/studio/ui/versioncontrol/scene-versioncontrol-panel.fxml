@@ -46,11 +46,6 @@
                             <Tooltip text="%versioncontrol_push" />
                         </tooltip>
                     </Button>
-                    <CheckBox fx:id="forcePushCheckBox" mnemonicParsing="false" text="%versioncontrol_force_push">
-                        <tooltip>
-                            <Tooltip text="%versioncontrol_force_push_tooltip" />
-                        </tooltip>
-                    </CheckBox>
                     <Separator orientation="VERTICAL" />
                     <Button accessibleText="%expand_all_versioncontrol_tree" mnemonicParsing="false" onAction="#onExpandAll" styleClass="default-button">
                         <graphic>

@@ -11,6 +11,7 @@ import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.ConfirmationResult;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.JFXFuture;
 import de.a12.studio.ui.util.StudioBundle;
@@ -71,9 +72,6 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
 
   @FXML
   private Button pushButton;
-
-  @FXML
-  private CheckBox forcePushCheckBox;
 
   @FXML
   private Button collapseProjectViewButton;
@@ -168,7 +166,6 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
       settings.save();
     });
 
-    forcePushCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> updateActionButtons());
 
     updateActionButtons();
     showBranchStatus(null);
@@ -204,8 +201,6 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
    */
   public void setProject(Project project) {
     this.project = project;
-    forcePushCheckBox.setSelected(false);
-
     updatingCommitMessageField = true;
     commitMessageField.setText(project == null
         ? ""
@@ -218,7 +213,6 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   @Override
   public void projectClosed(@NonNull ProjectClosedEvent event) {
     this.project = null;
-    forcePushCheckBox.setSelected(false);
     currentChangedFiles = List.of();
     setTreeRoot(null);
     showBranchStatus(null);
@@ -418,10 +412,8 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     if (commitButton != null) {
       commitButton.setDisable(!anyChecked || message == null || message.isBlank());
     }
-    if (pushButton != null && forcePushCheckBox != null) {
-      boolean force = forcePushCheckBox.isSelected();
-      pushButton.setDisable(currentBranchStatus == null || !currentBranchStatus.canPush(force));
-      forcePushCheckBox.setDisable(currentBranchStatus == null || currentBranchStatus.detached() || !currentBranchStatus.hasRemote());
+    if (pushButton != null) {
+      pushButton.setDisable(currentBranchStatus == null || !currentBranchStatus.canPush(true));
     }
   }
 
@@ -497,26 +489,27 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     if (gitService == null || currentBranchStatus == null) {
       return;
     }
-    boolean force = forcePushCheckBox.isSelected();
-    if (!currentBranchStatus.canPush(force)) {
+    if (!currentBranchStatus.canPush(true)) {
       return;
     }
-    if (force) {
-      Optional<ButtonType> confirmation = WidgetFactory.showConfirmation(getStage(),
-          StudioBundle.get("confirm_force_push", currentBranchStatus.branch()), null, null,
-          StudioBundle.get("versioncontrol_force_push"));
-      if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
-        return;
-      }
+    // Force is a one-off decision made per push; pre-checked only when a normal push has nothing to send
+    // (e.g. after a local reset), where a force push is the only way to proceed.
+    ConfirmationResult confirmation = WidgetFactory.showConfirmationWithCheckbox(getStage(),
+        StudioBundle.get("confirm_push", currentBranchStatus.branch()), StudioBundle.get("versioncontrol_push"),
+        StudioBundle.get("versioncontrol_force_push_tooltip"), null, StudioBundle.get("versioncontrol_force_push"),
+        !currentBranchStatus.canPush(false));
+    if (!confirmation.isOkClicked()) {
+      return;
+    }
+    boolean force = confirmation.isChecked();
+    if (!currentBranchStatus.canPush(force)) {
+      WidgetFactory.showAlert(getStage(), StudioBundle.get("versioncontrol_nothing_to_push"), null, null);
+      return;
     }
     GitOperationProgressModel progressModel = new GitOperationProgressModel(StudioBundle.get("versioncontrol_pushing"),
         () -> gitService.push(force));
     ProgressResultModel result = ProgressDialog.createProgressDialog(getStage(), progressModel);
-    if (result.isSuccess()) {
-      // A force push is a one-off decision, never a sticky mode.
-      forcePushCheckBox.setSelected(false);
-    }
-    else if (!result.isCancelled()) {
+    if (!result.isSuccess() && !result.isCancelled()) {
       log.error("Failed to push");
     }
     // Ahead/behind counts change on success, and a rejected push may still have updated nothing - refresh either way.

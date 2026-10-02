@@ -678,7 +678,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     menuFactory = new ProjectTreeMenuActions(this::getStage, this::onReload, this::openItem, this::openItemInNewWindow,
         this::getProjectRoot);
     ProjectTreeContextMenu contextMenuFactory = new ProjectTreeContextMenu(menuFactory);
-    for (ModelType modelType : ModelType.values()) {
+    for (ModelType modelType : ModelTypeLabels.sortedByDisplayName()) {
       if (modelType == ModelType.DOCUMENT) {
         // Document Model gets a submenu with import options.
         Menu documentMenu = new Menu(ModelTypeLabels.getDisplayName(modelType));

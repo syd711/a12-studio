@@ -1,6 +1,9 @@
 package de.a12.studio.modelsvalidation.validators.overview;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelReference;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.Annotation;
 import de.a12.studio.models.formmodel.Binding;
 import de.a12.studio.models.formmodel.BindingComponent;
 import de.a12.studio.models.formmodel.BindingComponentModelsSme;
@@ -13,10 +16,13 @@ import de.a12.studio.models.relationshipuimodel.EditConfiguration;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiComponent;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.relationshipuimodel.TableListComponent;
+import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.validators.form.FormBindingElements;
 
 import java.util.List;
+
+import tools.jackson.databind.JsonNode;
 
 /**
  * Whether an Overview Model is the Available Items or Selected Items overview of a Form Model {@link Binding}/
@@ -81,7 +87,63 @@ public final class OverviewBindingPurpose {
         return purpose;
       }
     }
+    return resolveFromBindingConfigurationAnnotation(overviewModelId, formModel);
+  }
+
+  /** The third wire shape: a header {@code bindingConfiguration} annotation (JSON string) whose
+   * {@code components[].models[]} entries are {@code {name, use}}. Classified like SME's
+   * {@code ComponentModelInfo.createFromUseAndModelType}: {@code candidate} is the Available Items overview,
+   * {@code link} to a header-referenced overview the Selected Items overview. */
+  private static String resolveFromBindingConfigurationAnnotation(String overviewModelId, FormModel formModel) {
+    for (Annotation annotation : formModel.getAnnotations()) {
+      String value = annotation.getValue();
+      if (!"bindingConfiguration".equals(annotation.getName()) || value == null || value.isBlank()) {
+        continue;
+      }
+      JsonNode root;
+      try {
+        root = JsonSettings.objectMapper.readTree(value);
+      }
+      catch (Exception e) {
+        continue;
+      }
+      String purpose = purposeFromBindingJson(overviewModelId, root, formModel);
+      if (purpose != null) {
+        return purpose;
+      }
+    }
     return null;
+  }
+
+  private static String purposeFromBindingJson(String overviewModelId, JsonNode node, FormModel formModel) {
+    if (node.isObject()) {
+      JsonNode name = node.get("name");
+      JsonNode use = node.get("use");
+      if (name != null && use != null && name.isString() && use.isString() && overviewModelId.equals(name.asString())) {
+        if ("candidate".equals(use.asString())) {
+          return AVAILABLE_ITEM;
+        }
+        if ("link".equals(use.asString()) && isReferencedOverview(overviewModelId, formModel)) {
+          return SELECTED_ITEM;
+        }
+      }
+    }
+    for (JsonNode child : node) {
+      String purpose = purposeFromBindingJson(overviewModelId, child, formModel);
+      if (purpose != null) {
+        return purpose;
+      }
+    }
+    return null;
+  }
+
+  private static boolean isReferencedOverview(String overviewModelId, FormModel formModel) {
+    for (ModelReference reference : formModel.getModelReferences()) {
+      if (overviewModelId.equals(reference.getReference()) && reference.getModelType() == ModelType.OVERVIEW) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private static String purposeFromComponent(String overviewModelId, BindingComponent component) {

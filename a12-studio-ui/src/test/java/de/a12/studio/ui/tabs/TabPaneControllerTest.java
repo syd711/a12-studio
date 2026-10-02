@@ -115,6 +115,7 @@ class TabPaneControllerTest {
     // The editors ask Studio for the validation service; without one, building the editor throws.
     Field validationService = Studio.class.getDeclaredField("validationService");
     validationService.setAccessible(true);
+    Object originalValidationService = validationService.get(null);
     validationService.set(null, null);
     controller = FxTestSupport.<TabPaneController>load("/de/a12/studio/ui/tabs/scene-tab-pane.fxml").controller();
     TabPane tabPane = FxTestSupport.field(controller, "tabPane");
@@ -122,26 +123,53 @@ class TabPaneControllerTest {
     FxTestSupport.onFx(() -> controller.projectOpened(new ProjectOpenedEvent(project)));
     project.getSettings().getUISettings().addOpenedFile(item.getPath());
 
-    FxTestSupport.onFx(() -> {
-      dismissAlerts();
-      controller.modelOpened(new ModelOpenedEvent(item));
-    });
+    try {
+      FxTestSupport.onFx(() -> {
+        dismissAlerts();
+        controller.modelOpened(new ModelOpenedEvent(item));
+      });
+      // The editor is built after the progress dialog; wait for the failure to play out (and its alert to be dismissed).
+      long deadline = System.currentTimeMillis() + 10_000;
+      while (System.currentTimeMillis() < deadline && !FxTestSupport.onFx(() -> tabPane.getTabs().isEmpty())) {
+        Thread.sleep(100);
+      }
+      Thread.sleep(1000); // the failure alert shows after the tab is dropped; keep dismissing until it is gone
+    }
+    finally {
+      dismissing.set(false);
+      validationService.set(null, originalValidationService);
+    }
 
     assertEquals(0, tabPane.getTabs().size(), "there is no editor to show");
     assertTrue(project.getSettings().getUISettings().getOpenedFiles().contains(item.getPath()),
         "a build that is only broken right now must not make the studio forget the tab");
   }
 
-  /** The failure alert waits for the user (showAndWait); hides every window that shows up, so the test can go on. */
+  /**
+   * Opening a model shows a progress dialog and, when its editor cannot be built, a failure alert - both wait for
+   * the user (showAndWait). Hides every window that shows up until {@link #dismissing} is cleared, so the test can go
+   * on; hiding only the first one would leave the alert behind the progress dialog blocking the FX thread.
+   */
   private static void dismissAlerts() {
-    Platform.runLater(() -> {
-      List<Window> showing = Window.getWindows().stream().filter(Window::isShowing).toList();
-      if (showing.isEmpty()) {
-        dismissAlerts();
+    Platform.setImplicitExit(false); // hiding the last window must not shut the toolkit down for the other tests
+    dismissing.set(true);
+    java.util.Set<Window> before = java.util.Set.copyOf(Window.getWindows().stream().filter(Window::isShowing).toList());
+    Thread poller = new Thread(() -> {
+      while (dismissing.get()) {
+        Platform.runLater(() -> Window.getWindows().stream().filter(w -> w.isShowing() && !before.contains(w)).toList().forEach(Window::hide));
+        try {
+          Thread.sleep(50);
+        }
+        catch (InterruptedException e) {
+          return;
+        }
       }
-      showing.forEach(Window::hide);
-    });
+    }, "dismiss-alerts");
+    poller.setDaemon(true);
+    poller.start();
   }
+
+  private static final java.util.concurrent.atomic.AtomicBoolean dismissing = new java.util.concurrent.atomic.AtomicBoolean();
 
   @Test
   void aRefactoredModelWithoutAnOpenTabChangesNothing() throws Exception {

@@ -2,6 +2,10 @@ package de.a12.studio.ui.util;
 
 import de.a12.studio.models.ModelType;
 
+import java.text.Collator;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Localized display names for {@link ModelType}, looked up from {@code messages.properties} via
  * {@link ModelType#getSuffix()} (e.g. {@code model_type_name.DM} for {@link ModelType#DOCUMENT}).
@@ -18,5 +22,14 @@ public final class ModelTypeLabels {
       return "";
     }
     return StudioBundle.get("model_type_name." + modelType.getSuffix().toUpperCase());
+  }
+
+  /** Every {@link ModelType} ordered alphabetically by its localized display name (locale-aware collation), as
+   * the "New" menus list them. */
+  public static List<ModelType> sortedByDisplayName() {
+    Collator collator = Collator.getInstance();
+    return Arrays.stream(ModelType.values())
+        .sorted((a, b) -> collator.compare(getDisplayName(a), getDisplayName(b)))
+        .toList();
   }
 }

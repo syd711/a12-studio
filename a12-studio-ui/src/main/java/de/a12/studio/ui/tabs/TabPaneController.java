@@ -84,6 +84,12 @@ public class TabPaneController implements Initializable, StudioEventListener {
    */
   private boolean loadingTabContent;
 
+  /**
+   * Set while "Close All" removes the tabs one by one: each removal hands the selection to a neighbour, which
+   * would otherwise lazily build that neighbour's editor only for it to be closed right after.
+   */
+  private boolean closingAllTabs;
+
   @Override
   public void projectClosed(@NonNull ProjectClosedEvent event) {
     closeDetachedWindows();
@@ -594,8 +600,14 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
     MenuItem closeAll = new MenuItem(StudioBundle.get("close_all"));
     closeAll.setOnAction(event -> {
-      for (Tab t : allTabs()) {
-        closeTab(t);
+      closingAllTabs = true;
+      try {
+        for (Tab t : allTabs()) {
+          closeTab(t);
+        }
+      }
+      finally {
+        closingAllTabs = false;
       }
     });
 
@@ -930,7 +942,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
   private void onSelectionChanged(StudioTabPane pane, Tab newTab) {
     ProjectItem item = newTab == null ? null : (ProjectItem) newTab.getUserData();
 
-    if (newTab != null && item != null && !restoringSelection && !loadingTabContent) {
+    if (newTab != null && item != null && !restoringSelection && !loadingTabContent && !closingAllTabs) {
       loadTabContentWithProgress(newTab, item);
     }
 

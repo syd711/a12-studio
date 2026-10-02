@@ -1204,6 +1204,26 @@ covered by round-trip tests.**
   UI-component configuration) and `BindingRepeat` (created instead of a plain `Binding` when the dragged
   relationship's target role is to-many). See TODO.md's "Fixed 2026-09-23" entry for the full file list.
 
+### Form Model generator (`FormScreenGenerator`), aligned 2026-10-02
+
+The earlier version was reverse-engineered from one golden fixture. The real generator is readable: npm
+`@com.mgmtp.a12.formengine/form-model-generator` 38.4.3 (`src/main/ts/generator/*`, anonymous download from
+`artifacts.geta12.com`, see the community-npm reference memory; SME's `fmmSupport.ts` imports it). `FormScreenGenerator`
+now ports its behavior (clean-room, covered by `FormScreenGeneratorTest`):
+- deterministic ids from the Document Model element ids (`Screen_for_<id>`, `Section_for_`, `ControlGrid_for_`,
+  `Row_for_`, `Control_for_`, `DetachedRepeat_for_`, `Column_for_`), no random suffixes;
+- consecutive fields share one Control Grid (`<group>_Controls`, `_1`, ... after an interruption); before, every
+  group got a single grid and sections were always appended after it, which reordered the Document Model;
+- repeatable groups become Detached Repeats (columns = non-repeatable field-like elements below the group, detail
+  screen named "Details"); a top-level repeatable group's list screen is `TL_Screen_for_<id>`;
+- attachment/multi-select groups behave like fields (a top-level one gets a single-control grid);
+- labels: a control only gets one if its field has none; titles use the element label filtered to the locales, else the
+  name; fields below a `metadata` group are read-only;
+- `percent`/`permille` number fields get a `%`/`‰` suffix in `fieldConfiguration`; with more than one screen the
+  sub header gets a navigation button per screen (the old note that no evidence existed for this was wrong);
+  `subHeaderBox`/`footerBox` are always written.
+Not compared: the generator version SME 38.2.0 really pins (38.4.3 is the closest published 38.x).
+
 ### Form Model: gap review (2026-09-27)
 
 Full field-by-field and validator-by-validator re-review, prompted by the same treatment already done for
@@ -1326,7 +1346,7 @@ needs to copy architecturally.
 | Feature | SME reference | a12-studio status |
 |---|---|---|
 | Editable tree / document graph | Add a root DM via an ER-diagram picker (reuses the Model Graph Diagram component); add relationship-traversal nodes (only relationships actually connected to the selected node are offered) | **Present since 2026-09-06** (corrected 2026-09-20; this row said "Missing — fixed, read-only mirror"): `content.links[]` (`QueryLink`) traversal hops, nested to any depth, added/removed in `QueryModelTreeController`; see "Status (2026-09-06): Phase 2". Still not like SME: the root DM is chosen in the Settings tab, not through an ER-diagram picker |
-| Per-node filter/constraint | Query-language grammar editor (ANTLR-backed, field/relationship autocomplete against the model graph), compiles to the `Operator` AST; semantically validated (field exists, type-correct operator, valid relationship+role) | Present, per graph node (`QueryDocumentNodePanelController`'s embedded `RuleEditorController`, `QueryLanguageEmitter`-validated, bracketed-path autocomplete via `BracketedPathSuggestionProvider`) — free-text QL grammar rather than SME's structured-AST editor, and only syntax is checked (field existence inside the expression isn't) |
+| Per-node filter/constraint | Query-language grammar editor (ANTLR-backed, field/relationship autocomplete against the model graph), compiles to the `Operator` AST; semantically validated (field exists, type-correct operator, valid relationship+role) | Present, per graph node (`QueryDocumentNodePanelController`'s embedded `RuleEditorController`, `QueryLanguageEmitter`-validated, bracketed-path autocomplete via `BracketedPathSuggestionProvider`; since 2026-10-02 also SME `proposer.ts`-style context completion, `QueryFilterCompletion`: functions, type-filtered operators and values, enumeration values, `Has` relationship/role names with the nested-constraint scope switch, `and`/`or`; inlay hints and hover docs are not ported) — free-text QL grammar rather than SME's structured-AST editor, and only syntax is checked (field existence inside the expression isn't) |
 | Target Document Model selection | Settings tab, editable at any time | Present (Settings tab, `QuerySettingsPanelController`), roughly at parity |
 | In-result field toggles | Inline tree checkboxes, tri-state on groups, disabled+forced for non-indexed fields | Present (`QueryModelTreeController`'s In-Result column, tri-state on groups) **and** the right panel's "Fields included in Result Set" list (add/remove + "All Fields of the Document Model") — non-indexed fields are still not specially disabled or forced in the tree (corrected 2026-09-20: the `indexed = false` annotation *is* known since the aggregation work, and the filter, aggregation and sort validators use it; the *field projection* check `QueryFieldReferenceValidator` and the tree checkbox do not) |
 | Sort | Multi-field, relationship-hop, direction, null-handling, ignore-case | Present (`QuerySort`/`QuerySortBy`/sorting panel), roughly at parity — `QueryTraversalOption.options()` scopes to *every* relationship in the project rather than only ones connected to the target DM |
@@ -1935,7 +1955,7 @@ the other 2 are not:
 real fixture regression test (`FixtureWorkspacesOverviewValidatorsTest`, new):** this note originally claimed
 two `OverviewFieldReferenceValidator`/`OverviewColumnHeaderLabelOrIconValidator` false positives on binding
 overviews. Only the first is real:
-- **Real, still open:** four of sixteen (`ProductMovie_OM`, three `e-commerce/99_BindingOverviewModels/*`
+- **Real, closed 2026-10-02 (`OverviewBindingPurpose.resolveFromBindingConfigurationAnnotation`):** four of sixteen (`ProductMovie_OM`, three `e-commerce/99_BindingOverviewModels/*`
   expression columns) have `purpose == null` - those Form Models (`ProductBook_FM` and siblings) use a *third*
   wire shape for their bindings that neither `OverviewBindingPurpose` nor the rest of this review accounted
   for: a header `bindingConfiguration` annotation (a JSON-encoded string,
