@@ -124,10 +124,7 @@
               }
             ]
           }
-        ],
-        "enumeratedStringFilter": {
-          "pagingSize": 10
-        }
+        ]
       }
     },
     "columns": [
@@ -196,14 +193,6 @@
       ]
     },
     "subHeaderBox": {
-      "rightSlot": [
-        {
-          "type": "search"
-        },
-        {
-          "type": "filter"
-        }
-      ],
       "leftSlot": [
         {
           "type": "button",
@@ -224,11 +213,19 @@
           "destructive": false,
           "primary": false
         }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
       ]
     },
     "footerBox": {
-      "rightSlot": [],
-      "leftSlot": []
+      "leftSlot": [],
+      "rightSlot": []
     }
   }
 }
