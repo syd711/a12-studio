@@ -88,6 +88,9 @@ public class RuleEditorController extends AbstractPropertyEditor implements Init
   // check. Left unset for plain expression fields with no dedicated grammar to validate against.
   private Function<String, String> validator;
 
+  // The validator's last message for the current text, null if it found none (or there is no validator).
+  private String validatorError;
+
   // Optional; supplies field/path autocomplete proposals for the current caret position (see Suggestion,
   // SuggestionProvider). Left unset for fields with no known field-tree context to suggest from.
   private SuggestionProvider suggestionProvider;
@@ -141,7 +144,18 @@ public class RuleEditorController extends AbstractPropertyEditor implements Init
     String text = codeArea.getText();
     writer.accept(blankToNull(text));
     validate(text);
-    commitChange();
+    try {
+      commitChange();
+    }
+    finally {
+      // commitChange() shows the validation service's verdict for the element, which knows nothing of what only this
+      // editor's validator can tell (e.g. the kernel's semantic check) and so would hide it again; the editor's own
+      // message wins for the text the user is typing right now. In a finally so a failing listener of the model-saved
+      // event cannot swallow it.
+      if (validatorError != null) {
+        showError("ERROR", validatorError);
+      }
+    }
   }
 
   /** Runs a still-pending debounced {@link #commitEdit()} immediately instead of waiting out {@link
@@ -453,6 +467,7 @@ public class RuleEditorController extends AbstractPropertyEditor implements Init
       return;
     }
     String error = blankToNull(text) == null ? null : validator.apply(text);
+    validatorError = error;
     if (error != null) {
       showError("ERROR", error);
     } else {

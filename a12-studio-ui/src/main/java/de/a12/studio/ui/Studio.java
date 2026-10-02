@@ -59,9 +59,33 @@ public class Studio extends Application implements StudioEventListener {
   private static GitService gitService;
   private static WindowsSnapHook windowsSnapHook;
 
+  /** Logs the environment settings that are most often relevant for support tickets. */
+  private static void logEnvironment() {
+    Runtime runtime = Runtime.getRuntime();
+    log.info("****************************** System Info ************************************************************");
+    log.info("OS: {} {} ({})", System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("os.arch"));
+    log.info("Java: {} {} ({}), runtime {}", System.getProperty("java.vendor"), System.getProperty("java.version"),
+        System.getProperty("java.vm.name"), System.getProperty("java.runtime.version"));
+    log.info("JavaFX: {}", System.getProperty("javafx.runtime.version"));
+    log.info("Encoding: file.encoding={}, native.encoding={}, stdout.encoding={}, sun.jnu.encoding={}, default charset={}",
+        System.getProperty("file.encoding"), System.getProperty("native.encoding"),
+        System.getProperty("stdout.encoding"), System.getProperty("sun.jnu.encoding"), java.nio.charset.Charset.defaultCharset());
+    log.info("Locale: default={}, display={}, format={}, user.language={}, user.country={}",
+        Locale.getDefault(), Locale.getDefault(Locale.Category.DISPLAY), Locale.getDefault(Locale.Category.FORMAT),
+        System.getProperty("user.language"), System.getProperty("user.country"));
+    log.info("Time zone: {}", java.util.TimeZone.getDefault().getID());
+    log.info("Memory: max heap {} MB, processors {}", runtime.maxMemory() / (1024 * 1024), runtime.availableProcessors());
+    log.info("Directories: user.dir={}, user.home={}, java.home={}", System.getProperty("user.dir"),
+        System.getProperty("user.home"), System.getProperty("java.home"));
+    log.info("****************************** /System Info ***********************************************************");
+  }
+
   @Override
   public void start(Stage stage) throws IOException {
     Studio.stage = stage;
+
+    // Before the language preference is applied, so the logged locale is the system's.
+    logEnvironment();
 
     // Apply stored language preference before any FXML is loaded.
     String storedLang = LocalUISettings.getString(LocalUISettings.LANGUAGE);

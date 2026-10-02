@@ -68,6 +68,17 @@ public final class FxTestSupport {
     field.set(null, null);
   }
 
+  /**
+   * Puts the "no real application" root controller back into {@code Studio}. {@link #startToolkit()} does this only
+   * the first time it runs; a test class that replaces {@code Studio.rootController} for its own purposes would
+   * otherwise leave every later {@link #selectProjectItem} without effect. Call before relying on the selection.
+   */
+  public static void installRootController() throws Exception {
+    Field rootController = Studio.class.getDeclaredField("rootController");
+    rootController.setAccessible(true);
+    rootController.set(null, new NoSelectionRootController());
+  }
+
   public static synchronized boolean startToolkit() throws Exception {
     if (toolkitAvailable != null) {
       return toolkitAvailable;

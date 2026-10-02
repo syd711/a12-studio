@@ -51,6 +51,19 @@ public final class ProjectKernelModels {
    * @return the flattened model, or empty if the kernel could not expand it or reported errors
    */
   public static Optional<DocumentModel> expand(ProjectItem contextItem, String modelId) {
+    return expandToJson(contextItem, modelId).flatMap(json -> {
+      try {
+        return Optional.of(JsonSettings.objectMapper.readValue(json, DocumentModel.class));
+      }
+      catch (Exception e) {
+        log.warn("Kernel expansion of {} could not be read back: {}", modelId, e.getMessage());
+        return Optional.empty();
+      }
+    });
+  }
+
+  /** Like {@link #expand} but returns the expanded model as the kernel's JSON, for callers that hand it to the kernel again. */
+  public static Optional<String> expandToJson(ProjectItem contextItem, String modelId) {
     if (modelId == null) {
       return Optional.empty();
     }
@@ -60,14 +73,10 @@ public final class ProjectKernelModels {
         log.debug("Kernel expansion of {} reported {}", modelId, expansion.findings());
         return Optional.empty();
       }
-      return Optional.of(JsonSettings.objectMapper.readValue(expansion.expandedJson(), DocumentModel.class));
+      return Optional.of(expansion.expandedJson());
     }
     catch (KernelException e) {
       log.debug("Kernel could not expand {}: {}", modelId, e.getMessage());
-      return Optional.empty();
-    }
-    catch (Exception e) {
-      log.warn("Kernel expansion of {} could not be read back: {}", modelId, e.getMessage());
       return Optional.empty();
     }
   }

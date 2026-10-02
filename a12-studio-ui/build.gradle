@@ -84,6 +84,13 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+tasks.named('test') {
+    // All UI test classes share one JVM and the JavaFX tests keep whole editors alive. With Gradle's default 512 MB the
+    // JVM ran out of heap ("Java heap space") and aborted the run after about 340 of 430 tests (measured 2026-10-02,
+    // also without the kernel); with 2 GB all 76 classes run to the end in about a minute.
+    maxHeapSize = '2g'
+}
+
 shadowJar {
     archiveFileName = 'a12-studio-ui.jar'
     zip64 = true
