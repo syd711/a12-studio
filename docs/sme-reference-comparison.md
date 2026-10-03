@@ -2489,14 +2489,14 @@ With no A12 installation the editor still works - the suggestions are just empty
    not a project file is an error up front.
 5. `Configuration` and `CodeLists` have no editor in SME either; here they are read, validated and kept. The transformer is called with XSD files only, like SME (genericode `.xml`
    code lists are not sent).
-6. The New Model dialog is the generic one (name, locales, roles); SME's also asks for the XSD - here it is the first thing the Transformation tab asks.
+6. The New Model dialog is the generic one (name, locales, roles) plus, for a Transformer Model, an optional main XSD (combo of the project's XSDs and an "Add XSD files..." button, 2026-10-03); it is written to `Cmd.mainXsd`. Left empty, the Transformation tab asks for it.
 
 **Not done (decided, not forgotten).**
-- **No other editor can pick the generated Document Model.** SME offers a Transformer Model wherever a Document Model is chosen (Form, Overview, Tree, Content, Query, Mapping,
+- **Generated Document Model for other editors (2026-10-03):** now cached by `GeneratedDocumentModels` (a12-studio-models; memory + `<project>/.a12-studio/generated/<id>.json`, stored by the Transformer editor after each successful run) and resolved by `CombinedDocumentModelElements.resolveForFieldReferences`, `ValidationContext.findOtherDocumentModel` and `ProjectDocumentModels.getOtherDocumentModelsWithCombinations`; not part of `otherDocumentModels()` (the time zone rule must not see it). Pinned by `GeneratedDocumentModelsTest`. Still open: never-transformed models offer nothing; not looked at in the pickers on a display. Original gap: SME offers a Transformer Model wherever a Document Model is chosen (Form, Overview, Tree, Content, Query, Mapping,
   Combination base model, ... via `dmReferenceProvider`); `ProjectDocumentModels` only knows `DocumentModel`s and Combination stand-ins, and the generated model exists only after
   a transformation. Needs the last generated Document Model cached (or regenerated on demand) behind that class. This is the main follow-up; the validators of those editors
   already report such a reference as "not found" (see the Tree/Query/Relationship gap reviews).
-- The generated Document Model is not kernel-validated (SME's `isDocumentModelValid`), and the preview has no element editor.
+- The generated Document Model is kernel-checked since 2026-10-03 (`GeneratedDocumentModelKernelCheck`, findings shown as issues); the preview has no element editor.
 - `/document/from-source` and `/to-source` (XML <-> A12 document on the installed backend), the JSON Schema transformer, the Gradle/CLI forms of the transformer.
 - Renaming a Transformer Model changes the id of its Document Model; nothing references one yet, so there is nothing to rewrite.
 

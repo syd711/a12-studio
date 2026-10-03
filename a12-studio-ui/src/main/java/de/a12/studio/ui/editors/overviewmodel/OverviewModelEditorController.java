@@ -276,7 +276,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
 
     updatingFromModel = true;
     try {
-      otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+      otherDocumentModels = ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem);
       otherQueryModels = ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.QUERY).stream()
           .filter(QueryModel.class::isInstance)
           .map(QueryModel.class::cast)
@@ -602,7 +602,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
    */
   @Override
   protected void onDocumentModelChangedElsewhere() {
-    otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    otherDocumentModels = ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem);
     refreshDocumentModelIndex();
   }
 

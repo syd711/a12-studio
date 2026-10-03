@@ -157,7 +157,7 @@ public class QueryAggregationPanelController extends AbstractPropertyEditor {
     candidates.clear();
     index = null;
     String targetId = content().getTargetDocumentModel();
-    List<DocumentModel> documentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    List<DocumentModel> documentModels = ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem);
     DocumentModel target = documentModels.stream().filter(dm -> dm.getId().equals(targetId)).findFirst().orElse(null);
     if (target == null || target.getContent() == null || target.getContent().getModelRoot() == null) {
       return;

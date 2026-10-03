@@ -208,7 +208,7 @@ public class TreeNodeConfigurationPanelController implements Initializable {
     if (projectItem == null) {
       return false;
     }
-    Collection<DocumentModel> documentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    Collection<DocumentModel> documentModels = ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem);
     List<TreeNode> nodes = model.getContent().getNodes();
     return TreeNodeInheritance.isSubTypeNode(node, nodes, documentModels);
   }

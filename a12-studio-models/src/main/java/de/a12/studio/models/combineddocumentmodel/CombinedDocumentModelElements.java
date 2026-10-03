@@ -1,6 +1,8 @@
 package de.a12.studio.models.combineddocumentmodel;
 
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.transformermodel.GeneratedDocumentModels;
+import de.a12.studio.models.transformermodel.TransformerModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModelContent;
 import de.a12.studio.models.documentmodel.Element;
@@ -68,6 +70,9 @@ public final class CombinedDocumentModelElements {
     }
     if (item.getModel() instanceof CombinedDocumentModel combinedModel) {
       return expand(contextItem, combinedModel);
+    }
+    if (item.getModel() instanceof TransformerModel) {
+      return GeneratedDocumentModels.resolve(contextItem, modelId);
     }
     return null;
   }

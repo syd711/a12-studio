@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectResources;
+import de.a12.studio.models.transformermodel.GeneratedDocumentModels;
 import de.a12.studio.models.transformermodel.TransformerModel;
 import de.a12.studio.models.transformermodel.TransformerModelContent;
 import de.a12.studio.models.util.JsonSettings;
@@ -112,6 +113,7 @@ public class TransformerModelEditorController extends AbstractEditorController {
     });
     issuesPanelController.setOnRunRequested(this::runNow);
 
+    previewPanelController.showElementDetails();
     for (TransformerModelPanelController panel : panels()) {
       panel.setModel(this.model);
       panel.setOnChange(this::scheduleRun);
@@ -177,6 +179,10 @@ public class TransformerModelEditorController extends AbstractEditorController {
       applyDiscovery();
     }
     issuesPanelController.show(outcome);
+    if (outcome.success() && outcome.documentModel() != null && model != null) {
+      // Offered to the other editors in place of a Document Model; a failed run keeps the last good one.
+      GeneratedDocumentModels.store(projectItem.getProjectFolder(), model.getId(), outcome.documentModel());
+    }
     previewPanelController.showDocumentModel(outcome.documentModel(), projectItem, previewPlaceholder(outcome));
   }
 

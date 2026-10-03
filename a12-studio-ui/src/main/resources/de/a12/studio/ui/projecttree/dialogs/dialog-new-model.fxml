@@ -8,6 +8,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="500.0" prefHeight="550.0" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
@@ -36,6 +37,17 @@
                             </VBox.margin>
                         </Label>
                         <ComboBox fx:id="documentModelCombo" maxWidth="1.7976931348623157E308" promptText="%select_a_document_model" />
+                        <Label fx:id="mainXsdLabel" styleClass="field-label" text="%new_model.main_xsd">
+                            <VBox.margin>
+                                <Insets top="12.0" />
+                            </VBox.margin>
+                        </Label>
+                        <HBox fx:id="mainXsdRow" spacing="6.0">
+                            <children>
+                                <ComboBox fx:id="mainXsdCombo" maxWidth="1.7976931348623157E308" promptText="%transformer_model.source.main_xsd_prompt" HBox.hgrow="ALWAYS" />
+                                <Button fx:id="addXsdButton" mnemonicParsing="false" onAction="#onAddXsd" text="%new_model.add_xsd" />
+                            </children>
+                        </HBox>
                         <CheckBox fx:id="buildScreensFromFieldsCheckBox" text="%build_screens_from_fields">
                             <VBox.margin>
                                 <Insets top="12.0" />

@@ -5,6 +5,9 @@ import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.util.JsonSettings;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.kernel.ProjectKernelModels;
 import de.a12.studio.ui.components.SearchFieldController;
@@ -14,6 +17,10 @@ import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.StackPane;
@@ -45,6 +52,14 @@ public class CombinationPreviewPanelController implements Initializable {
   private StackPane treeContainer;
 
   @FXML
+  private SplitPane split;
+
+  // The read-only element details under the tree, only for a preview that asks for them (see showElementDetails).
+  private VBox detailsPane;
+  private GridPane detailsGrid;
+  private TextArea detailsJson;
+
+  @FXML
   private TreeView<ElementViewModel> tree;
 
   private ProjectItem projectItem;
@@ -65,6 +80,77 @@ public class CombinationPreviewPanelController implements Initializable {
     searchController.installShortcut(tree);
     tree.setShowRoot(false);
     tree.setCellFactory(view -> new CombinationPreviewElementTreeCell());
+    tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showDetailsOf(newValue));
+  }
+
+  /**
+   * Adds a read-only view of the selected element under the tree, like SME's Transformer Model preview, whose element
+   * editor is the Document Model's own one made read-only: what the element is (name, kind, type, id, annotations) and
+   * its full configuration as JSON (a group without its children).
+   */
+  public void showElementDetails() {
+    if (detailsPane != null) {
+      return;
+    }
+    detailsGrid = new GridPane();
+    detailsGrid.setHgap(12);
+    detailsGrid.setVgap(4);
+    detailsJson = new TextArea();
+    detailsJson.setEditable(false);
+    detailsJson.getStyleClass().add("code-area");
+    detailsJson.setPrefRowCount(8);
+    detailsJson.setStyle("-fx-font-family: monospace;");
+    detailsPane = new VBox(8, detailsGrid, detailsJson);
+    detailsPane.setPadding(new javafx.geometry.Insets(8));
+    javafx.scene.layout.VBox.setVgrow(detailsJson, javafx.scene.layout.Priority.ALWAYS);
+    split.getItems().add(detailsPane);
+    split.setDividerPositions(0.6);
+    showDetailsOf(tree.getSelectionModel().getSelectedItem());
+  }
+
+  private void showDetailsOf(@Nullable TreeItem<ElementViewModel> selected) {
+    if (detailsPane == null) {
+      return;
+    }
+    detailsGrid.getChildren().clear();
+    if (selected == null || selected.getValue() == null) {
+      detailsJson.clear();
+      detailsGrid.add(new Label(StudioBundle.get("combination_preview.select_element")), 0, 0);
+      return;
+    }
+    ElementViewModel viewModel = selected.getValue();
+    Element element = viewModel.getElement();
+    int row = 0;
+    row = addDetail(row, "combination_preview.name", element.getName());
+    row = addDetail(row, "combination_preview.kind", viewModel.isGroup() ? "Group" : element.getType() == null ? null : element.getType().getValue());
+    row = addDetail(row, "combination_preview.type", viewModel.getType());
+    row = addDetail(row, "combination_preview.id", element.getId());
+    for (var annotation : element.getAnnotations()) {
+      row = addDetail(row, "combination_preview.annotation", annotation.getName() + (annotation.getValue() == null ? "" : " = " + annotation.getValue()));
+    }
+    try {
+      JsonNode json = JsonSettings.objectMapper.valueToTree(element);
+      if (json instanceof ObjectNode object && object.path("Group") instanceof ObjectNode group) {
+        group.remove("elements");
+      }
+      detailsJson.setText(JsonSettings.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(json));
+    }
+    catch (RuntimeException e) {
+      detailsJson.setText(String.valueOf(e.getMessage()));
+    }
+  }
+
+  private int addDetail(int row, String key, @Nullable String value) {
+    if (value == null || value.isBlank()) {
+      return row;
+    }
+    Label label = new Label(StudioBundle.get(key));
+    label.getStyleClass().add("field-label");
+    Label text = new Label(value);
+    text.setWrapText(true);
+    detailsGrid.add(label, 0, row);
+    detailsGrid.add(text, 1, row);
+    return row + 1;
   }
 
   public void load(@NonNull CombinedDocumentModel model, @NonNull ProjectItem projectItem) {

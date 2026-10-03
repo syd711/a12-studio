@@ -35,7 +35,7 @@ public final class TreeProjectModels {
    * Models (SME's sub type resolution works on every standalone Document Model type).
    */
   public static List<A12Model<?>> heterogeneityModels(@NonNull ProjectItem projectItem) {
-    List<A12Model<?>> models = new ArrayList<>(ProjectDocumentModels.getOtherDocumentModels(projectItem));
+    List<A12Model<?>> models = new ArrayList<>(ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem));
     models.addAll(ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.COMBINATION));
     return models;
   }

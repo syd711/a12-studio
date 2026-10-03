@@ -99,7 +99,7 @@ public record QueryTraversalOption(String relationshipModel, String targetRole) 
       if (documentModelId == null) {
         return null;
       }
-      return ProjectDocumentModels.getOtherDocumentModels(projectItem).stream()
+      return ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem).stream()
           .filter(dm -> dm.getId().equals(documentModelId))
           .findFirst()
           .orElse(null);

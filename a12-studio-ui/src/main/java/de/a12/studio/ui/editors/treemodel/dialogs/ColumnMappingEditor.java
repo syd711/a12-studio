@@ -238,7 +238,7 @@ public final class ColumnMappingEditor {
       return null;
     }
     DocumentModel documentModel = ProjectDocumentModels.resolveDocumentModelForFieldReferences(documentModelId);
-    return OverviewElementOptions.indexOf(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem));
+    return OverviewElementOptions.indexOf(documentModel, ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem));
   }
 
   /** {@code elementId}'s path in {@code elementIndex}, or the id itself when there is no index or it doesn't resolve. */

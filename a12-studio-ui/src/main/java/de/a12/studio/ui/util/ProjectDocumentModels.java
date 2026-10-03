@@ -9,6 +9,7 @@ import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.relationshipmodel.EntityCharacteristic;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.transformermodel.GeneratedDocumentModels;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.StudioEventManager;
 import org.jspecify.annotations.NonNull;
@@ -37,11 +38,27 @@ public final class ProjectDocumentModels {
    * name a combination - e.g. the Document Model of a Form Model bound to one.
    */
   public static List<DocumentModel> getOtherDocumentModelsWithCombinations(@NonNull ProjectItem projectItem) {
-    List<DocumentModel> result = new ArrayList<>(getOtherDocumentModels(projectItem));
+    List<DocumentModel> result = new ArrayList<>(getOtherDocumentModelsWithGenerated(projectItem));
     for (A12Model<?> combination : getOtherModelsOfType(projectItem, ModelType.COMBINATION)) {
       DocumentModel standIn = resolveDocumentModelForFieldReferences(combination.getId());
       if (standIn != null) {
         result.add(standIn);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * {@link #getOtherDocumentModels}, plus for every Transformer Model of the project the Document Model it last
+   * generated (see {@link GeneratedDocumentModels}; none before its first transformation), carrying the Transformer
+   * Model's id. For the editors where SME lets a Transformer Model be chosen in place of a Document Model.
+   */
+  public static List<DocumentModel> getOtherDocumentModelsWithGenerated(@NonNull ProjectItem projectItem) {
+    List<DocumentModel> result = new ArrayList<>(getOtherDocumentModels(projectItem));
+    for (A12Model<?> transformer : getOtherModelsOfType(projectItem, ModelType.TRANSFORMER)) {
+      DocumentModel generated = GeneratedDocumentModels.resolve(projectItem, transformer.getId());
+      if (generated != null) {
+        result.add(generated);
       }
     }
     return result;

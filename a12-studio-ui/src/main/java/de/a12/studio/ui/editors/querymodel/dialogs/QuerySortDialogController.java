@@ -155,7 +155,7 @@ public class QuerySortDialogController implements DialogController {
   @Nullable
   private DocumentModel resolveDocumentModel(@NonNull QueryTraversalOption traversal) {
     if (QueryTraversalOption.NONE.equals(traversal)) {
-      return ProjectDocumentModels.getOtherDocumentModels(projectItem).stream()
+      return ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem).stream()
           .filter(dm -> dm.getId().equals(targetDocumentModelId))
           .findFirst()
           .orElse(null);

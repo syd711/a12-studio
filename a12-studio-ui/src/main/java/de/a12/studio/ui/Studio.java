@@ -83,6 +83,7 @@ public class Studio extends Application implements StudioEventListener {
   @Override
   public void start(Stage stage) throws IOException {
     Studio.stage = stage;
+    de.a12.studio.ui.editors.transformermodel.TransformerRegeneration.install();
 
     // Before the language preference is applied, so the logged locale is the system's.
     logEnvironment();

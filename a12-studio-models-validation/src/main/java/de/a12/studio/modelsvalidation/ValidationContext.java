@@ -5,6 +5,8 @@ import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.transformermodel.GeneratedDocumentModels;
+import de.a12.studio.models.transformermodel.TransformerModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 
 import java.util.HashMap;
@@ -71,7 +73,18 @@ public final class ValidationContext {
     if (id == null) {
       return null;
     }
-    return otherDocumentModels.stream().filter(model -> id.equals(model.getId())).findFirst().orElse(null);
+    DocumentModel found = otherDocumentModels.stream().filter(model -> id.equals(model.getId())).findFirst().orElse(null);
+    return found != null ? found : findGeneratedDocumentModel(id);
+  }
+
+  /**
+   * The Document Model a Transformer Model of the project last generated, if {@code id} names one. Not part of
+   * {@link #otherDocumentModels()} (that list feeds the cross-model rules such as the time zone), only of the lookup
+   * by id that reference checks use.
+   */
+  private DocumentModel findGeneratedDocumentModel(String id) {
+    ProjectItem context = projectItem != null ? projectItem : project != null ? project.getRoot() : null;
+    return context == null ? null : GeneratedDocumentModels.resolve(context, id);
   }
 
   /**
@@ -83,7 +96,8 @@ public final class ValidationContext {
    * {@link CombinedDocumentModel} reference since that type doesn't extend {@link DocumentModel}.
    */
   public boolean hasOtherDocumentOrCombinedModel(String id) {
-    return findOtherDocumentModel(id) != null || findOtherModel(id) instanceof CombinedDocumentModel;
+    return findOtherDocumentModel(id) != null || findOtherModel(id) instanceof CombinedDocumentModel
+        || findOtherModel(id) instanceof TransformerModel;
   }
 
   /**

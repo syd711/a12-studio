@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.transformermodel;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.modelsvalidation.kernel.GeneratedDocumentModelKernelCheck;
 import de.a12.studio.models.transformermodel.TransformerCmd;
 import de.a12.studio.models.transformermodel.TransformerModel;
 import de.a12.studio.models.util.JsonSettings;
@@ -83,7 +84,7 @@ public final class TransformerRun {
         return new TransformationOutcome(TransformationOutcome.State.INCOMPLETE, StudioBundle.get("transformer_model.run.no_root_element"),
             false, null, List.of(), discovery);
       }
-      return parseTransformation(backend.transform(config, resources), discovery);
+      return withKernelFindings(parseTransformation(backend.transform(config, resources), discovery));
     }
     catch (PreviewAppException e) {
       return TransformationOutcome.unavailable(e.getMessage());
@@ -92,6 +93,25 @@ public final class TransformerRun {
       log.warn("The transformation of '{}' failed unexpectedly: {}", model.getId(), e.getMessage(), e);
       return TransformationOutcome.unavailable(String.valueOf(e.getMessage()));
     }
+  }
+
+  /**
+   * {@code outcome} with the kernel's findings about the generated Document Model added as issues, like SME's
+   * {@code isDocumentModelValid}; an invalid model makes the transformation count as failed.
+   */
+  static TransformationOutcome withKernelFindings(@NonNull TransformationOutcome outcome) {
+    if (!outcome.success() || outcome.documentModel() == null) {
+      return outcome;
+    }
+    List<Issue> issues = new ArrayList<>(outcome.issues());
+    boolean valid = true;
+    for (GeneratedDocumentModelKernelCheck.Finding finding : GeneratedDocumentModelKernelCheck.check(outcome.documentModel())) {
+      valid &= !finding.error();
+      issues.add(new Issue(finding.error() ? TransformationOutcome.SEVERITY_ERROR : TransformationOutcome.SEVERITY_WARNING,
+          finding.message(), finding.elementPath()));
+    }
+    return new TransformationOutcome(outcome.state(), outcome.message(), valid, outcome.documentModel(), List.copyOf(issues),
+        outcome.discovery());
   }
 
   /**

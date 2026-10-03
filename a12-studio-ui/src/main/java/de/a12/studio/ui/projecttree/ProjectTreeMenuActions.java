@@ -5,6 +5,7 @@ import de.a12.studio.models.Locale;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.NewModelFactory;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.transformermodel.TransformerModel;
 import de.a12.studio.models.util.ModelReferenceRewriter;
 import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
 import de.a12.studio.ui.bookmarks.BookmarkService;
@@ -99,6 +100,11 @@ public class ProjectTreeMenuActions {
     try {
       ProjectItem item = NewModelFactory.createModel(selectedFolder, modelType, name, documentModelId, buildScreensFromFields);
       boolean needsSave = false;
+      String mainXsd = input.get().mainXsd();
+      if (item.getModel() instanceof TransformerModel transformer && mainXsd != null && !mainXsd.isBlank()) {
+        transformer.getContent().getOrCreateCmd().setMainXsd(mainXsd);
+        needsSave = true;
+      }
       // A Typesetting Model's header has no locales, so the dialog's are not applied to it.
       if (!locales.isEmpty() && modelType != ModelType.TYPESETTING) {
         item.getModel().setLocales(locales);

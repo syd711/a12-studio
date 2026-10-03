@@ -84,7 +84,7 @@ public class SourceModelDialogController implements DialogController {
     if (projectItem == null) {
       return List.of();
     }
-    return ProjectDocumentModels.getOtherDocumentModels(projectItem).stream()
+    return ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem).stream()
         .map(DocumentModel::getId)
         .sorted(Comparator.naturalOrder())
         .toList();

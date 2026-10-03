@@ -370,8 +370,16 @@ class FormModelActions {
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }
-    if (item.getNode() instanceof Screen screen) {
-      removeNavigationButtonsTargeting(screen.getId());
+    if (item.getNode() instanceof Screen screen && screen.getId() != null) {
+      List<NavigationButton> buttons = navigationButtonsTargeting(screen.getId());
+      if (!buttons.isEmpty()) {
+        List<Screen> alternatives = content.getScreens().stream().filter(other -> other != screen && other.getId() != null).toList();
+        Optional<List<NavigationReferenceDialog.Decision>> decisions = NavigationReferenceDialog.show(buttons, alternatives);
+        if (decisions.isEmpty()) {
+          return;
+        }
+        applyNavigationDecisions(decisions.get());
+      }
     }
     Command command = createRemoveCommand(item);
     if (command != null) {
@@ -386,7 +394,7 @@ class FormModelActions {
    * What else a delete of {@code item} takes with it, so the confirmation can say so instead of doing it silently
    * (SME shows its refactoring dialog here): the navigation buttons that target a deleted screen and the entries
    * other Controls hold in {@code dependentControls} for a deleted screen element - see {@link
-   * #removeNavigationButtonsTargeting} and {@link #createRemoveCommand}, which do the actual cleanup.
+   * #applyNavigationDecisions} and {@link #createRemoveCommand}, which do the actual cleanup.
    */
   List<String> affectedReferences(@NonNull FormElementViewModel item) {
     List<String> lines = new ArrayList<>();
@@ -451,12 +459,7 @@ class FormModelActions {
     return new CompositeCommand(detach, new RemoveDependentControlEntriesCommand(content, removedIds));
   }
 
-  /**
-   * Removes every {@link NavigationButton} whose {@code target} matches {@code screenId} from all
-   * {@link HeaderFooterBox}es in the model (model-level subHeaderBox/footerBox and every per-screen
-   * subHeaderBox/footerBox).  Called before the screen is detached so the model is left consistent.
-   */
-  private void removeNavigationButtonsTargeting(@NonNull String screenId) {
+  private List<HeaderFooterBox> allHeaderFooterBoxes() {
     List<HeaderFooterBox> boxes = new ArrayList<>();
     boxes.add(content.getSubHeaderBox());
     boxes.add(content.getFooterBox());
@@ -464,24 +467,45 @@ class FormModelActions {
       boxes.add(screen.getSubHeaderBox());
       boxes.add(screen.getFooterBox());
     }
-    for (HeaderFooterBox box : boxes) {
-      if (box == null) {
-        continue;
-      }
-      removeFromGroup(box.getMajorButtons(), screenId);
-      removeFromGroup(box.getMinorButtons(), screenId);
-    }
+    boxes.removeIf(java.util.Objects::isNull);
+    return boxes;
   }
 
-  private static void removeFromGroup(@Nullable ButtonGroup group, @NonNull String screenId) {
-    if (group == null) {
+  private List<NavigationButton> navigationButtonsTargeting(@NonNull String screenId) {
+    List<NavigationButton> result = new ArrayList<>();
+    for (HeaderFooterBox box : allHeaderFooterBoxes()) {
+      for (ButtonGroup group : java.util.Arrays.asList(box.getMajorButtons(), box.getMinorButtons())) {
+        if (group == null) {
+          continue;
+        }
+        for (Button button : group.getButton()) {
+          if (button instanceof NavigationButton navigationButton && screenId.equals(navigationButton.getTarget())) {
+            result.add(navigationButton);
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  /** SME's Commit (clear the target) / Edit (new target) / Delete (remove the button) for each affected button. */
+  private void applyNavigationDecisions(@NonNull List<NavigationReferenceDialog.Decision> decisions) {
+    Set<Button> toRemove = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+    for (NavigationReferenceDialog.Decision decision : decisions) {
+      switch (decision.action()) {
+        case CLEAR_TARGET -> decision.button().setTarget(null);
+        case RETARGET -> decision.button().setTarget(decision.newTarget());
+        case DELETE_BUTTON -> toRemove.add(decision.button());
+      }
+    }
+    if (toRemove.isEmpty()) {
       return;
     }
-    Iterator<Button> it = group.getButton().iterator();
-    while (it.hasNext()) {
-      Button button = it.next();
-      if (button instanceof NavigationButton navBtn && screenId.equals(navBtn.getTarget())) {
-        it.remove();
+    for (HeaderFooterBox box : allHeaderFooterBoxes()) {
+      for (ButtonGroup group : java.util.Arrays.asList(box.getMajorButtons(), box.getMinorButtons())) {
+        if (group != null) {
+          group.getButton().removeIf(toRemove::contains);
+        }
       }
     }
   }

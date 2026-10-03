@@ -87,7 +87,7 @@ public class QueryDocumentNodePanelController {
     // models is a tree walk. Must be in place before setCustom, which validates the initial value.
     scopeModel = targetDocumentModel;
     QueryFilterReferenceChecker.Models projectModels = new QueryFilterReferenceChecker.Models(
-        ProjectDocumentModels.getOtherDocumentModels(projectItem),
+        ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem),
         ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.RELATIONSHIP).stream()
             .filter(RelationshipModel.class::isInstance).map(RelationshipModel.class::cast).toList());
     referenceChecker = new QueryFilterReferenceChecker(projectModels);

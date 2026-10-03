@@ -71,7 +71,7 @@ public class MappingModelEditorController extends AbstractEditorController imple
   }
 
   private List<DocumentModel> documentModelOptions() {
-    return ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    return ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem);
   }
 
   private String currentTargetDmId() {

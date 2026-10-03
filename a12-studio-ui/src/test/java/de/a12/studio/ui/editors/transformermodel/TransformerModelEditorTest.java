@@ -365,6 +365,25 @@ class TransformerModelEditorTest {
   }
 
   @Test
+  void aSelectedPreviewElementIsShownReadOnlyWithItsConfiguration() throws Exception {
+    TransformerModelEditorController editor = openEditor();
+    awaitFirstAnswer(editor);
+    Object preview = field(editor, "previewPanelController");
+    TreeView<?> tree = field(preview, "tree");
+    await(() -> tree.getRoot() != null && !tree.getRoot().getChildren().isEmpty());
+
+    javafx.scene.control.TextArea json = field(preview, "detailsJson");
+    FxTestSupport.onFx(() -> {
+      tree.getSelectionModel().select(0);
+      return null;
+    });
+
+    assertFalse(FxTestSupport.onFx(() -> json.isEditable()), "the details can not be edited");
+    assertTrue(FxTestSupport.onFx(() -> json.getText()).contains("\"name\""), "the element's configuration is shown");
+    assertFalse(FxTestSupport.onFx(() -> json.getText()).contains("\"elements\""), "a group without its children");
+  }
+
+  @Test
   void theIssuesOfTheTransformationAreListedWithoutTheInformationMessagesUnlessAskedFor() throws Exception {
     TransformerModelEditorController editor = openEditor();
     awaitFirstAnswer(editor);

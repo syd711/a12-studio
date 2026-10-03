@@ -12,6 +12,8 @@ import de.a12.studio.models.Locale;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.projects.ProjectResources;
+import de.a12.studio.ui.components.StudioFileChooser;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -19,10 +21,14 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +36,7 @@ import java.util.Optional;
 public class NewModelDialogController implements DialogController {
 
   public record NewModelInput(ModelType modelType, String name, String documentModelId, List<Locale> locales,
-      List<String> roles, ProjectItem folder, boolean buildScreensFromFields) {
+      List<String> roles, ProjectItem folder, boolean buildScreensFromFields, String mainXsd) {
   }
 
   @FXML
@@ -41,6 +47,15 @@ public class NewModelDialogController implements DialogController {
 
   @FXML
   private ComboBox<String> documentModelCombo;
+
+  @FXML
+  private Label mainXsdLabel;
+
+  @FXML
+  private HBox mainXsdRow;
+
+  @FXML
+  private ComboBox<String> mainXsdCombo;
 
   @FXML
   private CheckBox buildScreensFromFieldsCheckBox;
@@ -82,6 +97,7 @@ public class NewModelDialogController implements DialogController {
       commonFieldsController.setModelType(newValue);
       updateDocumentModelVisibility(newValue);
       updateBuildScreensFromFieldsVisibility(newValue);
+      updateMainXsdVisibility(newValue);
       if (!requiresDocumentModel(newValue)) {
         // Switching away from a document-model type: seed roles from the application model instead
         if (targetFolder != null) {
@@ -141,6 +157,43 @@ public class NewModelDialogController implements DialogController {
     documentModelCombo.setManaged(visible);
   }
 
+  // A Transformer Model is nothing without its XSD (SME's New Model modal asks for it), so it is the one thing asked up front.
+  private void updateMainXsdVisibility(ModelType modelType) {
+    boolean visible = modelType == ModelType.TRANSFORMER;
+    for (javafx.scene.Node node : List.of(mainXsdLabel, mainXsdRow)) {
+      node.setVisible(visible);
+      node.setManaged(visible);
+    }
+  }
+
+  private void refreshXsdFiles(String select) {
+    List<String> names = ProjectResources.findFiles(targetFolder.getProjectFolder(), "xsd").stream().map(File::getName).sorted().toList();
+    mainXsdCombo.getItems().setAll(names);
+    mainXsdCombo.setValue(select != null ? select : mainXsdCombo.getValue());
+  }
+
+  @FXML
+  private void onAddXsd() {
+    StudioFileChooser chooser = new StudioFileChooser();
+    chooser.setTitle(StudioBundle.get("transformer_model.source.add_xsd_title"));
+    chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(StudioBundle.get("transformer_model.source.xsd_filter"), "*.xsd"));
+    List<File> chosen = chooser.showOpenMultipleDialog(stage);
+    if (chosen == null) {
+      return;
+    }
+    String first = null;
+    for (File file : chosen) {
+      try {
+        File resource = ProjectResources.addResource(targetFolder.getProjectFolder(), file, "xsd");
+        first = first == null ? resource.getName() : first;
+      }
+      catch (IOException e) {
+        WidgetFactory.showAlert(stage, StudioBundle.get("transformer_model.source.add_xsd_failed", file.getName(), e.getMessage()));
+      }
+    }
+    refreshXsdFiles(first);
+  }
+
   // "Build Screens from Fields" only makes sense for Form Models (see FormScreenGenerator); unlike the
   // Overview Model, which also requires a document model but has no screen tree to generate.
   private void updateBuildScreensFromFieldsVisibility(ModelType modelType) {
@@ -186,6 +239,8 @@ public class NewModelDialogController implements DialogController {
       // roles #init just seeded.
       controller.typeComboBox.getSelectionModel().select(preselectedType);
     }
+    controller.refreshXsdFiles(null);
+    controller.updateMainXsdVisibility(controller.typeComboBox.getValue());
     controller.validate();
     WidgetFactory.installResizable(stage);
     stage.showAndWait();
@@ -197,7 +252,8 @@ public class NewModelDialogController implements DialogController {
         String documentModelId = requiresDocumentModel(modelType) ? controller.documentModelCombo.getValue() : null;
         boolean buildScreensFromFields = modelType == ModelType.FORM && controller.buildScreensFromFieldsCheckBox.isSelected();
         return Optional.of(new NewModelInput(modelType, name, documentModelId, controller.commonFieldsController.getLocales(),
-            controller.commonFieldsController.getRoles(), controller.commonFieldsController.getFolder(), buildScreensFromFields));
+            controller.commonFieldsController.getRoles(), controller.commonFieldsController.getFolder(), buildScreensFromFields,
+            modelType == ModelType.TRANSFORMER ? controller.mainXsdCombo.getValue() : null));
       }
     }
     return Optional.empty();

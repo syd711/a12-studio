@@ -188,7 +188,7 @@ public class TreeChildRelationshipDialogController implements DialogController {
       return null;
     }
     List<String> acceptable = new ArrayList<>(List.of(nodeDocumentModelId));
-    acceptable.addAll(DocumentModelHeterogeneity.reachableSuperTypes(ProjectDocumentModels.getOtherDocumentModels(projectItem), nodeDocumentModelId));
+    acceptable.addAll(DocumentModelHeterogeneity.reachableSuperTypes(ProjectDocumentModels.getOtherDocumentModelsWithGenerated(projectItem), nodeDocumentModelId));
     List<String> matching = relationship.getContent().getEntityCharacteristics().stream()
         .filter(entity -> entity.getRole() != null && acceptable.contains(entity.getDocumentModel()))
         .map(EntityCharacteristic::getRole)
