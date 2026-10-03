@@ -1,0 +1,172 @@
+{
+  "header": {
+    "id": "Everything_TfM",
+    "modelType": "transformer",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ]
+  },
+  "content": {
+    "Cmd": {
+      "mainXsd": "EnrollmentCertificate_XSD.xsd",
+      "rootElement": "EnrollmentCertificate",
+      "allowRemoteXsd": true,
+      "clXmlsDir": "codelists",
+      "minimal": true,
+      "externalTypeDefs": true,
+      "roles": "admin, editor"
+    },
+    "Configuration": {
+      "version": "15.12.2024",
+      "timeZone": "Europe/Berlin",
+      "supportedCharactersTypeInXsd": "datatypeC"
+    },
+    "TypeMapping": [
+      {
+        "xsdType": "custom_TaxIDNr",
+        "a12Type": "StringType",
+        "StringType": {
+          "lineBreaksPermitted": false,
+          "pattern": "[0-9]{11}",
+          "minLength": 11,
+          "maxLength": 11,
+          "alphabeticalSorting": true
+        }
+      },
+      {
+        "xsdType": "custom_AmountWithTwoDigits",
+        "a12Type": "NumberType",
+        "NumberType": {
+          "minFractionalDigits": 2,
+          "maxFractionalDigits": 2,
+          "minValue": 0,
+          "maxValue": 999999.99,
+          "leadingZerosAllowed": false,
+          "positivesOnly": true,
+          "minLength": 1,
+          "maxLength": 12,
+          "trait": "Amount",
+          "maxIntegerDigits": 6,
+          "zeroNotAllowed": false
+        }
+      },
+      {
+        "xsdType": "custom_FederalStateAbbreviation",
+        "a12Type": "EnumerationType",
+        "EnumerationType": {
+          "alphabeticalSorting": true
+        }
+      },
+      {
+        "xsdType": "date",
+        "a12Type": "DateType"
+      }
+    ],
+    "CodeLists": {
+      "CodeIdentifiers": [
+        {
+          "value": "enumValues"
+        }
+      ],
+      "ValueIdentifiersDe": [
+        {
+          "value": "germanEnumLabels"
+        }
+      ],
+      "ValueIdentifiersEn": [
+        {
+          "value": "englishEnumLabels"
+        }
+      ],
+      "ElementNamesInXsd": [
+        {
+          "value": "codeElementName"
+        }
+      ],
+      "UriVersionList": [
+        {
+          "uri": "urn:xoev-de:xnachweis:codeliste:sprachen-iso-639-1",
+          "version": "2023-12"
+        }
+      ]
+    },
+    "RenamePaths": [
+      {
+        "OriginalPath": "/EnrollmentCertificate/IdNr",
+        "NewElementName": "TaxId"
+      }
+    ],
+    "DeletePaths": [
+      {
+        "path": "/EnrollmentCertificate/CreationDate"
+      }
+    ],
+    "PatternErrors": [
+      {
+        "pattern": "\\d{11}",
+        "action": "REPLACE",
+        "replacement": "[0-9]{11}",
+        "errors": [
+          {
+            "locale": "de",
+            "text": "Bitte geben Sie 11 Ziffern ein."
+          },
+          {
+            "locale": "en",
+            "text": "Please enter 11 digits."
+          }
+        ]
+      },
+      {
+        "pattern": "\\d{5}",
+        "errors": [
+          {
+            "locale": "en",
+            "text": "Exactly 5 digits."
+          }
+        ]
+      },
+      {
+        "pattern": ".*[^\\s].*",
+        "action": "SUPPRESS"
+      }
+    ],
+    "EnumLabels": [
+      {
+        "value": "BW",
+        "replacements": [
+          {
+            "locale": "de",
+            "text": "Baden-Württemberg"
+          }
+        ],
+        "typeDefinitionId": "custom_FederalStateAbbreviation"
+      },
+      {
+        "value": "SN",
+        "replacements": [
+          {
+            "locale": "en",
+            "text": "Saxony"
+          }
+        ],
+        "enumFieldPath": "/EnrollmentCertificate/University/State"
+      }
+    ],
+    "SomethingNew": {
+      "kept": true
+    }
+  }
+}

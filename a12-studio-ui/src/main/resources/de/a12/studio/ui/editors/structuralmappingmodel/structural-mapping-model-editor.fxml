@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 
-<BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.structuralmappingmodel.StructuralMappingModelEditorController">
+<BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css, @structural-mapping.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.structuralmappingmodel.StructuralMappingModelEditorController">
     <right>
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
@@ -17,18 +18,21 @@
             </items>
         </ToolBar>
     </right>
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="16.0" styleClass="smm-banner" BorderPane.alignment="CENTER">
+            <children>
+                <Label fx:id="contextLabel" wrapText="true" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                <Label fx:id="problemsLabel" minWidth="-Infinity" styleClass="smm-banner-problems" />
+                <Button fx:id="removeInvalidButton" managed="false" minWidth="-Infinity" mnemonicParsing="false" onAction="#onRemoveInvalidElements" styleClass="default-button" text="%structural_mapping.remove_invalid" visible="false" />
+            </children>
+        </HBox>
+    </top>
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
-            <content>
-                <VBox spacing="12.0" styleClass="field-editor">
-                    <children>
-
-                    </children>
-                    <padding>
-                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                    </padding>
-                </VBox>
-            </content>
-        </ScrollPane>
+        <SplitPane fx:id="splitPane" dividerPositions="0.33" BorderPane.alignment="CENTER">
+            <items>
+                <fx:include fx:id="sourcePane" source="smm-tree-pane.fxml" />
+                <fx:include fx:id="targetPane" source="smm-tree-pane.fxml" />
+            </items>
+        </SplitPane>
     </center>
 </BorderPane>

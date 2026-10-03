@@ -29,7 +29,8 @@ public enum ModelType {
   // "query", so a genuine Query Model despite its own file's "OverviewModelRefactoring" name) uses "_QM".
   // Left as "QM" (not changed to "QeM") since the evidence contradicts itself rather than confirming one
   // convention over the other. SELECTION's "SeM" is the suffix documented in this repo's CLAUDE.md Model
-  // Types table, not a best-effort guess.
+  // Types table, not a best-effort guess. TRANSFORMER's "TfM" is the one in that table and the one SME's real
+  // example fixture uses (University_Certificates_TfM.json).
   APPLICATION("application"),
   COMBINATION("combination"),
   CONTENT("content"),
@@ -44,6 +45,7 @@ public enum ModelType {
   RELATIONSHIPUI("relationship-ui"),
   SELECTION("selection"),
   STRUCTURALMAPPING("structuralmapping"),
+  TRANSFORMER("transformer"),
   TREE("tree"),
   TYPEDEFINITION("typedefinition"),
   TYPESETTING("typesetting");

@@ -14,6 +14,7 @@ import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.transformermodel.TransformerModel;
 import de.a12.studio.models.treemodel.TreeConfiguration;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typesettingmodel.TypesettingModel;
@@ -297,16 +298,18 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         subtitleController.setVisible(false);
         modelStylesController.setVisible(false);
       }
+      // A Transformer Model's supported characters are a Configuration of its content (a regex or an XSD type, never
+      // the Document Model's own list this panel edits), and SME's Settings tab has no references editor for it either.
       supportedCharactersController.setVisible(
           !(model instanceof ApplicationModel) && !(model instanceof OverviewModel) && !(model instanceof FormModel)
               && !(model instanceof RelationshipModel) && !(model instanceof QueryModel) && !(model instanceof AdditiveDocumentModel)
-              && !(model instanceof TreeModel));
+              && !(model instanceof TreeModel) && !(model instanceof TransformerModel));
       // A Content Model's only reference is its Document Model, which has a panel of its own (SME offers no free
       // references editor there and rewrites them to that one on save).
       modelReferencesController.setVisible(
           !(model instanceof OverviewModel) && !(model instanceof FormModel) && !(model instanceof QueryModel)
               && !(model instanceof AdditiveDocumentModel) && !(model instanceof TreeModel)
-              && !(model instanceof ContentModel));
+              && !(model instanceof ContentModel) && !(model instanceof TransformerModel));
       if (generalAndRolesOnly) {
         modelSettingsNameController.setVisible(false);
         supportedCharactersController.setVisible(false);

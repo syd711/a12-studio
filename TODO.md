@@ -24,7 +24,7 @@ then `./gradlew ... test`). Without `DISPLAY` every FX-toolkit test is silently 
 
 ## Open decisions
 
-1. **[OWNER] Which model types to finish next.** Only Print is `enabled: false` in `model-versions.json`. Mapping has target + sources only and Structural Mapping is a stub, yet both are enabled. Transformer, Model Graph Diagram, Link/Document do not exist. Comparison doc's ranking: structural mapping -> mapping -> additive overlay editing -> print. Decide the order, and whether the two near-empty enabled editors should be switched off until usable.
+1. **[OWNER] Which model types to finish next.** Only Print is `enabled: false` in `model-versions.json`. Mapping has target, sources and the Structural Mapping Model link but no precomputation fragment (the Structural Mapping editor itself was built 2026-10-03). Model Graph Diagram, Link/Document do not exist (the Transformer Model editor was built 2026-10-03, see below). Comparison doc's ranking: (structural mapping done) -> mapping -> additive overlay editing -> print. Decide the order.
 
 ## Open issues
 
@@ -45,6 +45,15 @@ then `./gradlew ... test`). Without `DISPLAY` every FX-toolkit test is silently 
 ### Form Model
 - **[LOCAL]** `PreprocessingSettingsPanelController` not yet looked at on a real display.
 - **Interactive Commit/Edit/Delete refactoring dialog:** the delete confirmation already lists the references it cleans up. Open: SME's per-reference choice (keep/edit instead of delete) and references from *other* models (e.g. Application Model entries pointing at a deleted Screen/Control) - a12-studio only reports those afterwards as validation errors. Cross-cutting with the Application Model, needs a design decision.
+
+### Structural Mapping Model
+- **[LOCAL]** Not looked at on a real display: drag and drop of a source field onto a target row, the tag columns' layout and context menu, the resolution-strategy and move-field-mapping dialogs, the Clear column. Needs a project whose Mapping Model has a source, a target and this model (kernel-backed, so the trees stay empty without one).
+
+### Transformer Model
+Built 2026-10-03 (four tabs + the Model Settings dialog, validators, runs the installed SME backend out of process; details and deviations in "Transformer Model: built" in `docs/sme-reference-comparison.md`). Open:
+- **[CLOUD] Offer the generated Document Model to the other editors** (the main gap). SME lets a Transformer Model be chosen wherever a Document Model is (Form, Overview, Tree, Content, Query, Mapping, Combination base model, ...); `ProjectDocumentModels` only knows `DocumentModel`s and Combination stand-ins, and the Document Model exists only after a transformation (`TransformerRun`, needs the installed SME). Needs the last generated model cached or regenerated on demand behind that class, then the pickers and the "not found" validators of those editors (see the Tree/Query/Relationship gap reviews) follow. Decide first whether an editor may depend on the installed SME just to list fields **[OWNER]**.
+- **[LOCAL]** Only rendered offscreen and driven through the FXML, not looked at in a running app: the "Add XSD files" file chooser, typing in the suggestion combo boxes while a run is in progress, the issue list with many messages.
+- Not done: kernel validation of the generated Document Model (SME's `isDocumentModelValid`), an element editor in the Preview tab, `/api/transformer/document/from-source` and `/to-source` of the installed backend (XML <-> A12 document), SME's New Model modal asking for the XSD up front.
 
 ### Composed Document Models
 - **[LOCAL]** Still unverified: a real SME Form Model bound to a CDM with a heterogeneous relationship (SME's own spec for `DescendantOfHeterogeneous*` / `InitialValueAndDescendantOfHeterogeneousToManyRelationship` is mocked).

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css, @transformer-model.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.transformermodel.TransformerModelEditorController">
+    <right>
+        <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
+            <items>
+                <fx:include fx:id="settingsToolbarButton" source="../editor-settings-toolbar-button.fxml" />
+                <Separator prefHeight="0.0" prefWidth="0.0" />
+                <fx:include fx:id="fileToolbarButtons" source="../editor-file-toolbar-buttons.fxml" />
+            </items>
+        </ToolBar>
+    </right>
+    <center>
+        <TabPane prefHeight="200.0" prefWidth="200.0" styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <tabs>
+                <Tab text="%transformer_model.tab_transformation">
+                    <content>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
+                            <content>
+                                <VBox spacing="12.0" styleClass="field-editor">
+                                    <children>
+                                        <fx:include fx:id="sourcePanel" source="transformer-source-panel.fxml"/>
+                                        <fx:include fx:id="typeMappingsPanel" source="type-mappings-panel.fxml"/>
+                                        <fx:include fx:id="issuesPanel" source="transformation-issues-panel.fxml"/>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                    </padding>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+                <Tab text="%transformer_model.tab_element_selection">
+                    <content>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
+                            <content>
+                                <VBox spacing="12.0" styleClass="field-editor">
+                                    <children>
+                                        <fx:include fx:id="renamePathsPanel" source="rename-paths-panel.fxml"/>
+                                        <fx:include fx:id="deletePathsPanel" source="delete-paths-panel.fxml"/>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                    </padding>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+                <Tab text="%transformer_model.tab_custom_texts">
+                    <content>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
+                            <content>
+                                <VBox spacing="12.0" styleClass="field-editor">
+                                    <children>
+                                        <fx:include fx:id="patternErrorsPanel" source="pattern-errors-panel.fxml"/>
+                                        <fx:include fx:id="enumLabelsPanel" source="enum-labels-panel.fxml"/>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                    </padding>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+                <Tab text="%transformer_model.tab_preview">
+                    <content>
+                        <fx:include fx:id="previewPanel" source="../combineddocumentmodel/combination-preview-panel.fxml"/>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

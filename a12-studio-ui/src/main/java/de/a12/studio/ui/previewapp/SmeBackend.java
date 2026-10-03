@@ -29,7 +29,8 @@ import java.util.concurrent.TimeUnit;
  * Document Model to a selection of its elements (ad hoc testing). The endpoints and payloads are the ones SME's own
  * client calls ({@code client/src/modules/commonDocumentModel/api/backendClient}). The request shapes are those of the
  * installed backend (13.0.2), which is what counts - the SME source checkout can be at another revision (its
- * combination expansion takes different fields, for one).
+ * combination expansion takes different fields, for one). It also runs the XSD-to-Document-Model transformer of the
+ * Transformer Model editor ({@link #transform}, {@link #discover}).
  *
  * <p>Singleton; the process is stopped with the application ({@link #stop()}, plus a shutdown hook).
  */
@@ -108,6 +109,52 @@ public final class SmeBackend {
       throw new PreviewAppException(message.toString());
     }
     return expanded;
+  }
+
+  /**
+   * An input of the XSD-to-Document-Model transformer: the transformer's {@code XmResource}, here always an
+   * {@code XSD} ({@code type}) with the file name as {@code name} and its text as {@code content}.
+   */
+  public record TransformerResource(String type, String name, String content) {
+
+    public static TransformerResource xsd(String fileName, String content) {
+      return new TransformerResource("XSD", fileName, content);
+    }
+  }
+
+  /**
+   * Runs the transformer of a Transformer Model ({@code POST /api/transformer/transform}): {@code transformationConfig}
+   * is the Transformer Model itself, {@code inputResources} the XSD files it may read (main XSD and what it includes).
+   * Returns the raw response {@code {generatedResources[], success, issues[]}}; the generated Document Model is the
+   * {@code A12_DOCUMENT_MODEL} resource. A failing transformation is a normal response ({@code success: false} with
+   * issues), not an exception.
+   */
+  public JsonNode transform(@NonNull JsonNode transformationConfig, @NonNull List<TransformerResource> inputResources)
+      throws PreviewAppException {
+    return post("/api/transformer/transform", transformerRequest(transformationConfig, inputResources));
+  }
+
+  /**
+   * XSD discovery of the same configuration ({@code POST /api/transformer/discover}): the information the Transformer
+   * Model's editor offers as suggestions - root elements, simple types, element paths, patterns, enumeration values.
+   * Returns the raw response {@code {discoveredInformation: {...}, success}}.
+   */
+  public JsonNode discover(@NonNull JsonNode transformationConfig, @NonNull List<TransformerResource> inputResources)
+      throws PreviewAppException {
+    return post("/api/transformer/discover", transformerRequest(transformationConfig, inputResources));
+  }
+
+  private static ObjectNode transformerRequest(JsonNode transformationConfig, List<TransformerResource> inputResources) {
+    ObjectNode request = JsonSettings.objectMapper.createObjectNode();
+    ArrayNode resources = request.putArray("inputResources");
+    for (TransformerResource resource : inputResources) {
+      ObjectNode node = resources.addObject();
+      node.put("type", resource.type());
+      node.put("name", resource.name());
+      node.put("content", resource.content());
+    }
+    request.set("transformationConfig", transformationConfig);
+    return request;
   }
 
   private static void putModels(ObjectNode request, String field, List<String> models) {

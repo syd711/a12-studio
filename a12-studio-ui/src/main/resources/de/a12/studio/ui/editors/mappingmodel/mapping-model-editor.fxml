@@ -37,6 +37,7 @@
                     <children>
                         <fx:include fx:id="targetModelPanel" source="../propertyeditors/target-model-panel.fxml"/>
                         <fx:include fx:id="sourceModelsPanel" source="source-models-panel.fxml"/>
+                        <fx:include fx:id="structuralMappingModelPanel" source="structural-mapping-model-panel.fxml"/>
                     </children>
                     <padding>
                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>

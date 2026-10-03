@@ -56,6 +56,9 @@ public class CombinationPreviewPanelController implements Initializable {
 
   private Label placeholderLabel;
 
+  // Overrides the Combination Model's own "no base model" text, see showDocumentModel.
+  private String placeholderText;
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     searchController.setOnSearch(this::applyFilter);
@@ -71,6 +74,22 @@ public class CombinationPreviewPanelController implements Initializable {
     this.mergedModel = ProjectKernelModels.expand(projectItem, model.getId())
         .orElseGet(() -> CombinedDocumentModelElements.resolveForFieldReferences(projectItem, model.getId()));
     this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem);
+    refresh();
+  }
+
+  /**
+   * Shows a Document Model that is already at hand instead of expanding a Combination Model - the Transformer Model
+   * editor's Preview tab reuses this panel for the Document Model its transformation generated. A {@code null}
+   * model shows {@code placeholder} (why there is none) in its place.
+   */
+  public void showDocumentModel(@Nullable DocumentModel documentModel, @NonNull ProjectItem projectItem, @NonNull String placeholder) {
+    this.projectItem = projectItem;
+    this.mergedModel = documentModel;
+    this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem);
+    if (placeholderLabel != null) {
+      placeholderLabel.setText(placeholder);
+    }
+    placeholderText = placeholder;
     refresh();
   }
 
@@ -94,7 +113,8 @@ public class CombinationPreviewPanelController implements Initializable {
 
   private void showPlaceholder() {
     if (placeholderLabel == null) {
-      placeholderLabel = new Label(StudioBundle.get("combined_document_model_editor.preview_unavailable"));
+      placeholderLabel = new Label(placeholderText != null ? placeholderText
+          : StudioBundle.get("combined_document_model_editor.preview_unavailable"));
       placeholderLabel.setWrapText(true);
       placeholderLabel.getStyleClass().add("placeholder-label");
       placeholderLabel.setMaxWidth(220);

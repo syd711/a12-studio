@@ -7,6 +7,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.mappingmodel.MappingModel;
 import de.a12.studio.models.mappingmodel.MappingSource;
 import de.a12.studio.models.mappingmodel.MappingTarget;
+import de.a12.studio.models.mappingmodel.StructuralMappingModelRef;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.propertyeditors.TargetModelPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -21,8 +22,10 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Edits a {@link MappingModel}: currently its Source models and Target, the {@link DocumentModel} the mapping
- * writes to. More fields (PreComputationFragment, StructuralMappingModel) are added later.
+ * Edits a {@link MappingModel}: currently its Source models, its Target - the {@link DocumentModel} the mapping
+ * writes to - and the Structural Mapping Model that holds the field mappings between them (which is edited in
+ * the context of this Mapping Model, see the Structural Mapping Model editor). More fields (PreComputationFragment)
+ * are added later.
  */
 public class MappingModelEditorController extends AbstractEditorController implements Initializable {
 
@@ -32,12 +35,16 @@ public class MappingModelEditorController extends AbstractEditorController imple
   @FXML
   private TargetModelPanelController targetModelPanelController;
 
+  @FXML
+  private StructuralMappingModelPanelController structuralMappingModelPanelController;
+
   private MappingModel model;
 
   @Override
   public void initialize(URL url, ResourceBundle resources) {
     targetModelPanelController.setOnChange(this::onTargetModelChanged);
     sourceModelsPanelController.setOnChange(this::onSourceModelsChanged);
+    structuralMappingModelPanelController.setOnChange(this::onStructuralMappingModelChanged);
   }
 
   @Override
@@ -50,6 +57,8 @@ public class MappingModelEditorController extends AbstractEditorController imple
     this.model = model;
     sourceModelsPanelController.setModel(model);
     targetModelPanelController.load(documentModelOptions(), currentTargetDmId());
+    structuralMappingModelPanelController.load(ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.STRUCTURALMAPPING),
+        currentStructuralMappingModelId());
   }
 
   /**
@@ -68,6 +77,26 @@ public class MappingModelEditorController extends AbstractEditorController imple
   private String currentTargetDmId() {
     MappingTarget target = model.getContent().getTarget();
     return target != null ? target.getDmId() : null;
+  }
+
+  private String currentStructuralMappingModelId() {
+    StructuralMappingModelRef reference = model.getContent().getStructuralMappingModel();
+    return reference != null ? reference.getId() : null;
+  }
+
+  private void onStructuralMappingModelChanged() {
+    String id = structuralMappingModelPanelController.getValue();
+    if (id == null) {
+      model.getContent().setStructuralMappingModel(null);
+    }
+    else {
+      StructuralMappingModelRef reference = new StructuralMappingModelRef();
+      reference.setId(id);
+      model.getContent().setStructuralMappingModel(reference);
+    }
+    syncModelReferences();
+    commitChange();
+    updateSettingsErrorBadge();
   }
 
   private void onTargetModelChanged() {
@@ -102,15 +131,22 @@ public class MappingModelEditorController extends AbstractEditorController imple
    * points at it, and one no longer used by either drops out. Replaces the whole DOCUMENT-type subset rather
    * than patching it incrementally, since with multiple Sources (and the Target) potentially sharing a dmId,
    * an incremental add/remove can't tell "no longer used by the field that just changed" apart from "no longer
-   * used at all".
+   * used at all". The Structural Mapping Model is referenced the same way (SME's {@code updateMappingModelReferences}).
    */
   private void syncModelReferences() {
     List<ModelReference> references = model.getModelReferences();
-    references.removeIf(reference -> reference.getModelType() == ModelType.DOCUMENT);
+    references.removeIf(reference -> reference.getModelType() == ModelType.DOCUMENT || reference.getModelType() == ModelType.STRUCTURALMAPPING);
     for (String dmId : currentDmIds()) {
       ModelReference reference = new ModelReference();
       reference.setModelType(ModelType.DOCUMENT);
       reference.setReference(dmId);
+      references.add(reference);
+    }
+    String structuralMappingModelId = currentStructuralMappingModelId();
+    if (structuralMappingModelId != null) {
+      ModelReference reference = new ModelReference();
+      reference.setModelType(ModelType.STRUCTURALMAPPING);
+      reference.setReference(structuralMappingModelId);
       references.add(reference);
     }
   }

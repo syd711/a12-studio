@@ -16,6 +16,7 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
+import de.a12.studio.models.transformermodel.TransformerModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typesettingmodel.TypesettingModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
@@ -35,6 +36,7 @@ import de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorControl
 import de.a12.studio.ui.editors.relationshipuimodel.RelationshipUiModelEditorController;
 import de.a12.studio.ui.editors.selectionmodel.SelectionModelEditorController;
 import de.a12.studio.ui.editors.structuralmappingmodel.StructuralMappingModelEditorController;
+import de.a12.studio.ui.editors.transformermodel.TransformerModelEditorController;
 import de.a12.studio.ui.editors.treemodel.TreeModelEditorController;
 import de.a12.studio.ui.editors.typesettingmodel.TypesettingModelEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionModelEditorController;
@@ -167,6 +169,13 @@ public class EditorFactory {
         loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         SelectionModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof TransformerModel) {
+        FXMLLoader loader = new FXMLLoader(TransformerModelEditorController.class.getResource("transformer-model-editor.fxml"));
+        loader.setResources(StudioBundle.getBundle());
+        content = loader.load();
+        TransformerModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof TypesettingModel) {

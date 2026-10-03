@@ -1,0 +1,92 @@
+{
+  "header": {
+    "id": "University_Certificates_TfM",
+    "modelType": "transformer",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "Cmd": {
+      "genDocModelName": "Univercity_Certificates_TfM",
+      "mainXsd": "EnrollmentCertificate_XSD.xsd",
+      "rootElement": "EnrollmentCertificate"
+    },
+    "Configuration": {
+      "timeZone": "UTC"
+    },
+    "PatternErrors": [
+      {
+        "errors": [
+          {
+            "locale": "de",
+            "text": "die 11-stellige IdNr gemäß § 139b AO"
+          },
+          {
+            "locale": "en",
+            "text": "The 11-digit IdNr according to § 139b AO"
+          }
+        ],
+        "pattern": "\\d{11}"
+      }
+    ],
+    "TypeMapping": [
+      
+    ],
+    "EnumLabels": [
+      {
+        "replacements": [
+          {
+            "locale": "de",
+            "text": "Baden Württemberg"
+          },
+          {
+            "locale": "en",
+            "text": "Baden Württemberg"
+          }
+        ],
+        "value": "BW"
+      },
+      {
+        "replacements": [
+          {
+            "locale": "de",
+            "text": "Sachsen"
+          },
+          {
+            "locale": "en",
+            "text": "Saxony"
+          }
+        ],
+        "value": "SN"
+      },
+      {
+        "replacements": [
+          {
+            "locale": "de",
+            "text": "Berlin"
+          },
+          {
+            "locale": "en",
+            "text": "Berlin"
+          }
+        ],
+        "value": "BE"
+      }
+    ]
+  }
+}

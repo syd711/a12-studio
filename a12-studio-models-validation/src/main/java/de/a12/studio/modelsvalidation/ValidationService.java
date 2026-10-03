@@ -16,6 +16,8 @@ import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.selectionmodel.SelectionModel;
+import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
+import de.a12.studio.models.transformermodel.TransformerModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typesettingmodel.TypesettingModel;
 import de.a12.studio.modelsvalidation.services.ApplicationModelValidationService;
@@ -30,6 +32,8 @@ import de.a12.studio.modelsvalidation.services.QueryModelValidationService;
 import de.a12.studio.modelsvalidation.services.RelationshipModelValidationService;
 import de.a12.studio.modelsvalidation.services.RelationshipUiModelValidationService;
 import de.a12.studio.modelsvalidation.services.SelectionModelValidationService;
+import de.a12.studio.modelsvalidation.services.StructuralMappingModelValidationService;
+import de.a12.studio.modelsvalidation.services.TransformerModelValidationService;
 import de.a12.studio.modelsvalidation.services.TreeModelValidationService;
 import de.a12.studio.modelsvalidation.services.TypesettingModelValidationService;
 import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
@@ -64,6 +68,8 @@ public class ValidationService {
   private final QueryModelValidationService queryModelValidationService = new QueryModelValidationService();
   private final CombinationModelValidationService combinationModelValidationService = new CombinationModelValidationService();
   private final SelectionModelValidationService selectionModelValidationService = new SelectionModelValidationService();
+  private final StructuralMappingModelValidationService structuralMappingModelValidationService = new StructuralMappingModelValidationService();
+  private final TransformerModelValidationService transformerModelValidationService = new TransformerModelValidationService();
   private final TypesettingModelValidationService typesettingModelValidationService = new TypesettingModelValidationService();
 
   public ValidationService(Project project) {
@@ -114,6 +120,8 @@ public class ValidationService {
       case QueryModel queryModel -> queryModelValidationService.validate(queryModel, context);
       case CombinedDocumentModel combinedDocumentModel -> combinationModelValidationService.validate(combinedDocumentModel, context);
       case SelectionModel selectionModel -> selectionModelValidationService.validate(selectionModel, context);
+      case StructuralMappingModel structuralMappingModel -> structuralMappingModelValidationService.validate(structuralMappingModel, context);
+      case TransformerModel transformerModel -> transformerModelValidationService.validate(transformerModel, context);
       case TypesettingModel typesettingModel -> typesettingModelValidationService.validate(typesettingModel, context);
       default -> List.of();
     };
@@ -135,6 +143,8 @@ public class ValidationService {
       case QUERY -> queryModelValidationService.addValidator(validator);
       case COMBINATION -> combinationModelValidationService.addValidator(validator);
       case SELECTION -> selectionModelValidationService.addValidator(validator);
+      case STRUCTURALMAPPING -> structuralMappingModelValidationService.addValidator(validator);
+      case TRANSFORMER -> transformerModelValidationService.addValidator(validator);
       case TYPESETTING -> typesettingModelValidationService.addValidator(validator);
     }
   }
@@ -155,6 +165,8 @@ public class ValidationService {
       case QUERY -> queryModelValidationService.removeValidator(validator);
       case COMBINATION -> combinationModelValidationService.removeValidator(validator);
       case SELECTION -> selectionModelValidationService.removeValidator(validator);
+      case STRUCTURALMAPPING -> structuralMappingModelValidationService.removeValidator(validator);
+      case TRANSFORMER -> transformerModelValidationService.removeValidator(validator);
       case TYPESETTING -> typesettingModelValidationService.removeValidator(validator);
     }
   }

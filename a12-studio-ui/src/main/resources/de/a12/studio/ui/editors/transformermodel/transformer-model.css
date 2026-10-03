@@ -1,0 +1,52 @@
+/* Transformer Model editor: the list entries of its panels and the transformation issues. */
+
+/* One entry of a list (a type mapping, a pattern error, an enumeration display text). */
+.transformer-card {
+    -fx-padding: 8;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-border-width: 1;
+    -fx-border-color: -fx-titled-pane-border;
+}
+
+.transformer-card-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-section-header;
+}
+
+.transformer-field-label {
+    -fx-text-fill: -fx-text-section-header;
+    -fx-font-size: 0.9em;
+}
+
+/* The locale of a text row: the code, not editable. */
+.transformer-locale-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-section-header;
+    -fx-min-width: 56;
+}
+
+.transformer-locale-label-orphan {
+    -fx-text-fill: -fx-error-bg;
+}
+
+.transformer-issue-error {
+    -fx-text-fill: -fx-error-bg;
+}
+
+.transformer-issue-warning {
+    -fx-text-fill: #B7791F;
+}
+
+.transformer-issue-info {
+    -fx-text-fill: -fx-text-section-header;
+}
+
+.transformer-status {
+    -fx-text-fill: -fx-text-section-header;
+}
+
+.transformer-status-failed {
+    -fx-text-fill: -fx-error-bg;
+    -fx-font-weight: bold;
+}

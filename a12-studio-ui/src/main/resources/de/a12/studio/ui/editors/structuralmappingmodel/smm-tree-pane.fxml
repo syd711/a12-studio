@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="root" spacing="8.0" stylesheets="@/de/a12/studio/ui/stylesheet.css, @structural-mapping.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.structuralmappingmodel.SmmTreePaneController">
+    <children>
+        <Label fx:id="titleLabel" styleClass="smm-pane-title" />
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <children>
+                <CheckBox fx:id="mappedCheckBox" mnemonicParsing="false" selected="true" text="%structural_mapping.mapped" />
+                <CheckBox fx:id="unmappedCheckBox" mnemonicParsing="false" selected="true" text="%structural_mapping.unmapped" />
+            </children>
+        </HBox>
+        <TextField fx:id="searchField" promptText="%structural_mapping.search_prompt" />
+        <TreeTableView fx:id="tree" showRoot="false" VBox.vgrow="ALWAYS">
+            <columns>
+                <TreeTableColumn fx:id="nameColumn" prefWidth="240.0" sortable="false" text="%structural_mapping.name" />
+            </columns>
+        </TreeTableView>
+    </children>
+    <padding>
+        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+    </padding>
+</VBox>

@@ -17,5 +17,6 @@
   "combination":        { "version": "1.0.0",  "enabled": true,  "suffix": "CDM" },
   "mapping":            { "version": "1.0.0",  "enabled": true, "suffix": "MM"  },
   "query":              { "version": "0.1.0",  "enabled": true,  "suffix": "QM"  },
-  "structuralmapping":  { "version": "1.0.0",  "enabled": true, "suffix": "SMM" }
+  "structuralmapping":  { "version": "1.0.0",  "enabled": true, "suffix": "SMM" },
+  "transformer":        { "version": "1.0.0",  "enabled": true,  "suffix": "TfM" }
 }

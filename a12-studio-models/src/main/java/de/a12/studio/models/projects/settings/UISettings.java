@@ -37,6 +37,11 @@ public class UISettings extends JsonSettings {
    */
   private List<String> projectTreeModelTypeFilter;
 
+  // Every model type that existed when projectTreeModelTypeFilter was saved: a type missing here was added to the
+  // Studio later and must show up in the tree, not be hidden by a filter that could not have known it. Null in a
+  // file saved before this list existed.
+  private List<String> projectTreeModelTypeFilterKnownTypes;
+
   @Override
   public String getSettingsName() {
     return SETTINGS_FILE_NAME;
@@ -122,6 +127,14 @@ public class UISettings extends JsonSettings {
 
   public void setProjectTreeModelTypeFilter(List<String> projectTreeModelTypeFilter) {
     this.projectTreeModelTypeFilter = projectTreeModelTypeFilter;
+  }
+
+  public List<String> getProjectTreeModelTypeFilterKnownTypes() {
+    return projectTreeModelTypeFilterKnownTypes;
+  }
+
+  public void setProjectTreeModelTypeFilterKnownTypes(List<String> projectTreeModelTypeFilterKnownTypes) {
+    this.projectTreeModelTypeFilterKnownTypes = projectTreeModelTypeFilterKnownTypes;
   }
 
   public static UISettings load() {

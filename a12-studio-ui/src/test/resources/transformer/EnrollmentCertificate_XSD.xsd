@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:simpleType name="custom_FederalStateAbbreviation">
+			<xs:restriction base="xs:string">
+			<xs:enumeration value="BW"/>
+			<xs:enumeration value="BY"/>
+			<xs:enumeration value="BE"/>
+			<xs:enumeration value="BB"/>
+			<xs:enumeration value="HB"/>
+			<xs:enumeration value="HH"/>
+			<xs:enumeration value="HE"/>
+			<xs:enumeration value="MV"/>
+			<xs:enumeration value="ND"/>
+			<xs:enumeration value="NW"/>
+			<xs:enumeration value="RP"/>
+			<xs:enumeration value="SL"/>
+			<xs:enumeration value="SN"/>
+			<xs:enumeration value="ST"/>
+			<xs:enumeration value="SH"/>
+			<xs:enumeration value="TH"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="custom_AmountWithTwoDigits">
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="custom_TaxIDNr">
+		<xs:annotation>
+			<xs:documentation xml:lang="DE">die 11-stellige IdNr gemäß § 139b AO</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="11"/>
+			<xs:pattern value="\d{11}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	
+	<xs:complexType name="UniversityCType">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string"/>
+			<xs:element name="State" type="custom_FederalStateAbbreviation"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	
+	<xs:complexType name="FeeCType">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string"/>
+			<xs:element name="AmountDue" type="custom_AmountWithTwoDigits"/>
+			<xs:element name="ReceivedPayment" minOccurs="1" maxOccurs="99">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="custom_AmountWithTwoDigits">
+							<xs:attribute name="DateOfPayment" type="xs:date" use="required" />
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:attributeGroup name="Subject-Attr_Group">
+		<xs:attribute name="Title" type="xs:string" use="required"/>
+		<xs:attribute name="NumberOfTerm" type="xs:positiveInteger" use="required"/>
+		<xs:attribute name="IsMainProgram" type="xs:boolean"/>
+		<xs:attribute name="EnrolledSince" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:nonNegativeInteger"/>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+	
+	
+ <xs:element name="EnrollmentCertificate" type="EnrollmentCertificateCType"/>
+	
+ <xs:complexType name="EnrollmentCertificateCType">
+  <xs:attribute name="IdNr" type="custom_TaxIDNr" use="required"/>
+  <xs:attribute name="CreationDate" type="xs:date" use="required"/>
+  <xs:attribute name="TermIssued" type="xs:string" use="required"/>
+  <xs:sequence>
+	<xs:element name="University" type="UniversityCType"/>
+	<xs:element name="Fee" type="FeeCType" minOccurs="1" maxOccurs="100"/>
+	<xs:element name="Enrollment" minOccurs="1" maxOccurs="10">	
+		<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attributeGroup ref="Subject-Attr_Group"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+	</xs:element>
+	<xs:element name="CurrentProgramProgress" type="FeeCType" minOccurs="1" maxOccurs="10"/>	
+ </xs:sequence>
+</xs:complexType>
+
+</xs:schema>

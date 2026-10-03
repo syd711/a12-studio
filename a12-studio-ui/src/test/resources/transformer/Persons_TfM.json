@@ -1,0 +1,84 @@
+{
+  "header": {
+    "id": "Persons_TfM",
+    "modelType": "transformer",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ]
+  },
+  "content": {
+    "Cmd": {
+      "mainXsd": "EnrollmentCertificate_XSD.xsd",
+      "rootElement": "EnrollmentCertificate"
+    },
+    "Configuration": {
+      "timeZone": "UTC"
+    },
+    "TypeMapping": [
+      {
+        "xsdType": "custom_AmountWithTwoDigits",
+        "a12Type": "NumberType",
+        "NumberType": {
+          "minFractionalDigits": 2,
+          "maxFractionalDigits": 2,
+          "trait": "Amount"
+        }
+      },
+      {
+        "xsdType": "custom_TaxIDNr",
+        "a12Type": "StringType",
+        "StringType": {
+          "minLength": 11,
+          "maxLength": 11
+        }
+      }
+    ],
+    "RenamePaths": [
+      {
+        "OriginalPath": "/EnrollmentCertificate/IdNr",
+        "NewElementName": "TaxId"
+      }
+    ],
+    "DeletePaths": [
+      {
+        "path": "/EnrollmentCertificate/CreationDate"
+      }
+    ],
+    "PatternErrors": [
+      {
+        "pattern": "\\d{11}",
+        "action": "REPLACE",
+        "replacement": "[0-9]{11}",
+        "errors": [
+          {
+            "locale": "en",
+            "text": "Eleven digits"
+          }
+        ]
+      }
+    ],
+    "EnumLabels": [
+      {
+        "value": "BW",
+        "replacements": [
+          {
+            "locale": "de",
+            "text": "Baden-Württemberg"
+          }
+        ]
+      }
+    ]
+  }
+}

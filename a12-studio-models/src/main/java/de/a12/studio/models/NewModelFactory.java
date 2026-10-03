@@ -53,6 +53,9 @@ import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.selectionmodel.SelectionModelContent;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModelContent;
+import de.a12.studio.models.transformermodel.TransformerConfiguration;
+import de.a12.studio.models.transformermodel.TransformerModel;
+import de.a12.studio.models.transformermodel.TransformerModelContent;
 import de.a12.studio.models.treemodel.ExpansionStrategy;
 import de.a12.studio.models.treemodel.TreeConfiguration;
 import de.a12.studio.models.treemodel.TreeModel;
@@ -197,6 +200,7 @@ public class NewModelFactory {
       case QUERY -> buildQueryModel(documentModelId, locales);
       case STRUCTURALMAPPING -> buildStructuralMappingModel(locales);
       case SELECTION -> buildSelectionModel(locales);
+      case TRANSFORMER -> buildTransformerModel(locales);
       case TYPESETTING -> buildTypesettingModel();
     };
   }
@@ -491,6 +495,18 @@ public class NewModelFactory {
       reference.setReference(documentModelId);
       model.getModelReferences().add(reference);
     }
+    model.setContent(content);
+    model.setLocales(locales);
+    return model;
+  }
+
+  // SME's editor gives a Transformer Model without one the default time zone (ensureTimeZoneAssigned) and an empty
+  // Cmd that the Transformation tab fills (main XSD, root element); nothing else is required up front.
+  private static TransformerModel buildTransformerModel(List<Locale> locales) {
+    TransformerModel model = new TransformerModel();
+    TransformerModelContent content = new TransformerModelContent();
+    content.getOrCreateCmd();
+    content.getOrCreateConfiguration().setTimeZone(TransformerConfiguration.DEFAULT_TIME_ZONE);
     model.setContent(content);
     model.setLocales(locales);
     return model;

@@ -17,6 +17,7 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
+import de.a12.studio.models.transformermodel.TransformerModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typesettingmodel.TypesettingModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
@@ -93,6 +94,7 @@ public class ModelFactory {
         case QUERY -> JsonSettings.objectMapper.treeToValue(root, QueryModel.class);
         case STRUCTURALMAPPING -> JsonSettings.objectMapper.treeToValue(root, StructuralMappingModel.class);
         case SELECTION -> JsonSettings.objectMapper.treeToValue(root, SelectionModel.class);
+        case TRANSFORMER -> JsonSettings.objectMapper.treeToValue(root, TransformerModel.class);
         case TYPESETTING -> JsonSettings.objectMapper.treeToValue(root, TypesettingModel.class);
         default -> {
           log.warn("Model type '{}' of '{}' is not supported yet", modelType, projectItem.getPath());

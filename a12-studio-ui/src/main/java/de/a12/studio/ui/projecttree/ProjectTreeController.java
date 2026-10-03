@@ -621,6 +621,14 @@ public class ProjectTreeController implements Initializable, StudioEventListener
         // Unknown/removed model type name from an older settings file; ignore it.
       }
     }
+    // A type the filter never knew (added to the Studio after it was saved) is shown, not hidden by the old filter.
+    List<String> known = project.getSettings().getUISettings().getProjectTreeModelTypeFilterKnownTypes();
+    for (ModelType modelType : ModelType.values()) {
+      boolean knownWhenSaved = known != null ? known.contains(modelType.name()) : modelType != ModelType.TRANSFORMER;
+      if (!knownWhenSaved) {
+        restored.add(modelType);
+      }
+    }
     selectedModelTypes.clear();
     selectedModelTypes.addAll(restored);
 
@@ -643,6 +651,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
     UISettings uiSettings = project.getSettings().getUISettings();
     uiSettings.setProjectTreeModelTypeFilter(selectedModelTypes.stream().map(Enum::name).toList());
+    uiSettings.setProjectTreeModelTypeFilterKnownTypes(java.util.Arrays.stream(ModelType.values()).map(Enum::name).toList());
     uiSettings.save();
   }
 

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="480.0" minWidth="560.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.structuralmappingmodel.dialogs.ResolutionStrategyDialogController">
+   <top>
+      <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
+   </top>
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="dialog-scroll-pane" BorderPane.alignment="CENTER">
+         <content>
+            <VBox spacing="14.0">
+               <children>
+                  <VBox spacing="6.0">
+                     <children>
+                        <Label styleClass="field-label" text="%structural_mapping.rs_target_group" />
+                        <TextField fx:id="targetGroupField" editable="false" />
+                     </children>
+                  </VBox>
+                  <VBox fx:id="parentLayersBox" spacing="6.0">
+                     <children>
+                        <Label styleClass="field-label" text="%structural_mapping.rs_parent_layers" />
+                        <ListView fx:id="parentLayersList" prefHeight="90.0" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0">
+                     <children>
+                        <Label styleClass="field-label" text="%structural_mapping.rs_type" />
+                        <ComboBox fx:id="typeCombo" editable="false" maxWidth="Infinity" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0">
+                     <children>
+                        <Label styleClass="field-label" text="%structural_mapping.rs_source_group" />
+                        <ComboBox fx:id="sourceGroupCombo" editable="false" maxWidth="Infinity" />
+                     </children>
+                  </VBox>
+                  <VBox fx:id="sliceBox" spacing="14.0">
+                     <children>
+                        <VBox spacing="6.0">
+                           <children>
+                              <Label styleClass="field-label" text="%structural_mapping.rs_slice_source_field" />
+                              <ComboBox fx:id="sliceSourceFieldCombo" editable="false" maxWidth="Infinity" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="6.0">
+                           <children>
+                              <Label styleClass="field-label" text="%structural_mapping.rs_slice_target_field" />
+                              <ComboBox fx:id="sliceTargetFieldCombo" editable="false" maxWidth="Infinity" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER_RIGHT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel">
+               <HBox.margin>
+                  <Insets right="12.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
+         </children>
+         <padding>
+            <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+         </padding>
+      </HBox>
+   </bottom>
+</BorderPane>

@@ -79,6 +79,7 @@ public interface Icons {
   String PNG_MODEL_QUERY = "/de/a12/studio/ui/icons/Model-Document_SCDM.png";
   String PNG_MODEL_SELECTION = "/de/a12/studio/ui/icons/Model-Document_SCDM.png";
   String PNG_MODEL_TYPESETTING = "/de/a12/studio/ui/icons/Typesetting.png";
+  String PNG_MODEL_TRANSFORMER = "/de/a12/studio/ui/icons/Model-Transformer.png";
 
   String ELEMENT_MULTI_SELECT = "mdi2c-checkbox-multiple-marked-outline";
   String DESELECT_ALL = "mdi2c-checkbox-multiple-blank-outline";
@@ -135,6 +136,7 @@ public interface Icons {
       case STRUCTURALMAPPING -> PNG_MODEL_STRUCTURALMAPPING;
       case SELECTION -> PNG_MODEL_SELECTION;
       case TYPESETTING -> PNG_MODEL_TYPESETTING;
+      case TRANSFORMER -> PNG_MODEL_TRANSFORMER;
     };
   }
 }

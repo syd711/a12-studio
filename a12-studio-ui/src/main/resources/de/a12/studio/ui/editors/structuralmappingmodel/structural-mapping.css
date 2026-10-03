@@ -1,0 +1,53 @@
+/* Structural Mapping Model editor: the source/target trees and the mapping tags in the target tree. */
+
+.smm-pane-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-section-header;
+}
+
+.smm-banner {
+    -fx-padding: 6 12 6 12;
+    -fx-background-color: -fx-titled-pane-header-bg;
+    -fx-border-color: -fx-titled-pane-border;
+    -fx-border-width: 0 0 1 0;
+}
+
+.smm-banner-problems {
+    -fx-text-fill: -fx-error-bg;
+    -fx-font-weight: bold;
+}
+
+/* A mapping tag: one field mapping or resolution strategy in the cell of its target row. */
+.smm-tag {
+    -fx-padding: 1 6 1 6;
+    -fx-background-radius: 3;
+    -fx-border-radius: 3;
+    -fx-border-width: 1;
+    -fx-border-color: #2E7674;
+    -fx-background-color: white;
+    -fx-text-fill: -fx-text-color;
+}
+
+.smm-tag-strategy {
+    -fx-background-color: #98D7D6;
+    -fx-border-color: #98D7D6;
+}
+
+/* The lookup field of a slice, shown in the row of that field. */
+.smm-tag-slice-field {
+    -fx-border-width: 0;
+    -fx-text-fill: #2E7674;
+}
+
+.smm-tag-error {
+    -fx-border-color: -fx-error-bg;
+    -fx-border-width: 2;
+}
+
+.smm-tag-icon {
+    -fx-icon-color: #2E7674;
+}
+
+.tree-table-row-cell.smm-drop-target {
+    -fx-background-color: -fx-selection-bg;
+}
