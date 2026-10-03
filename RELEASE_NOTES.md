@@ -1,93 +1,68 @@
-# Release Notes 2026.06-ext0-0.1.2
+# Release Notes 2026.06-ext0-0.1.3
 
 ## Highlights
 
-- **Tree Model** and **Content Model** now have complete, enabled editors (previously a stub and a disabled editor, respectively). Mapping, Structural Mapping and Query Models were also switched on.
-- A broad gap-closing pass against the SME reference implementation touched nearly every model type: Document, Form, Type Definition, Relationship, Combined Document, Query, Master Detail, Application, Overview and Print Typesetting Models.
-- Roles validation (`HeaderRolesValidator`) is now wired into every model type's validation service, closing a gap that had been open across the board.
+- **A12 kernel (`31.1.1`) is now a dependency**, reached only through the new `a12-studio-kernel` facade module. It backs rule and computation validation, Document Model / Combination expansion, additive join and the Combination Model preview.
+- **Structural Mapping Model** and **Transformer Model** editors were built. The Transformer Model runs the installed SME backend out of process.
+- Many Form Model, Document Model, Overview and Query Model refinements.
 
-## Tree Model
+## Kernel integration
 
-- Built out and enabled: five tabs (Tree, Node Types, Configuration, Layout, Custom Actions).
-- New Expansion Strategy editor: Initial Expansion, Pagination, "Enable Expand/Collapse The Whole Tree", and an Expansion Depths editor that only offers relationships without a depth and keeps unused strategy keys from lingering when switching strategy type.
-- `Row Activation` replaces the old default row action; column widths are now decimal (matching Overview Model); every context (row, header, multi-selection, row activation) gets its real event list, hiding copy/paste while a relationship has a link Document Model.
-- Node type and insert-action Document Model pickers now offer Combination Models and only the real per-position candidates (not every Document Model in the project).
-- Added a Virtual Root panel (enable, Label, node actions, context menu).
-- 17 new validators (root reference, virtual scrolling, multi-selection, styles, columns, node structure, child relationships, actions, roles).
-- Rename/move refactoring now covers tree models (relationships, node types, columns).
+- Rule and computation validation, also while typing in the rule, computation options and computation alternative editors.
+- In-service condition validation reports kernel findings next to the grammar check, cached per model.
+- Kernel-backed Combination Model preview; combination parity (several steps, additive models that redefine a reference field, `DecorationForGroups`) is pinned by tests.
+- Contract tests over `testing/workspaces` guard the facade against kernel changes.
 
-## Content Model
+## Transformer Model
 
-- Built out and enabled: Document Model and Base Group binding via a proper settings panel (replacing the free-text Model References panel), with correct import/export semantics for the document reference.
-- Structural rules are now enforced on every edit, not just insertion: move, cut, duplicate and paste are all blocked when they would produce an invalid tree; drag and drop was added, with drop zones for above/below/inside.
-- 12 new validators: node shape, whole-tree structure, document model type, base group, group/field/image/conditional references (data-context aware), form elements, event nodes, settings, and warnings.
-- New editors: Form Element settings, Localization, Additional Settings, Annotations, Conditions, Date Picker configuration, Message Group Container (with auto-collected field/group lists), Image dynamic source, and inline field/group references inside rich text.
-- Validation results are now shown in the editor: per-row markers with tooltips, an error/warning summary under the tree, and the settings button badge.
-- Roles validation is now applied to Content Models as well.
+- New editor with four tabs and the Model Settings dialog, plus validators.
+- The generated Document Model is validated with the kernel; an error fails the run so the model is not cached.
+- The last successful result is cached (memory and `.a12-studio/generated/`) and offered in the Overview, Tree, Query and Mapping editors' Document Model pickers. A model that was never transformed is regenerated in the background when another editor asks for it.
+- The Preview tab shows the selected element read-only.
+- The New Model dialog asks for an optional main XSD, with an "Add XSD files..." entry.
 
-## Overview Model
+## Structural Mapping Model
 
-- Enumerated String Filter now has an editable field list (previously invisible/uneditable).
-- Action Column Width is now decimal, matching SME; a new model no longer serializes stray `null`s and seeds the sub-header/row-action-group the way SME does.
-- Sub-header elements (Search, Filter, Multi-Selection) are now gated by their feature switches, and Overview Models used as a Form Model's Available/Selected Items binding are recognized and exempted from rules that don't apply to them.
-- Expression columns are now validated, backed by a new Expression language grammar ported from the platform docs; column-level rules added for suffix references, preferred sorting, display mode, and style references.
-- Added validation for Paging Size / Row Height / Action Column Width, Initial Sorting duplicates and non-sortable columns, Filter Section labels, Context Menu groups, and the `export_excel` Composed-Document-Model warning.
-- Metadata fields (`__meta/createdAt` and friends) can now be picked in field/column pickers; Custom Selection of Fields gained Subtype support for heterogeneous Document Models.
-- An "Add" button next to the Query Model reference now creates a new Query Model pre-filled from the Overview's own columns, paging and sorting.
-- Structural refactoring: deleting a column now prunes Default Sorting, disabling Search/Filter/Multi-Selection now removes its sub-header element, and renaming/deleting a Style now cascades to every column that referenced it.
-
-## Application Model
-
-- `Constraints` now round-trips arbitrary keys (previously only `MasterDetail`/`preferredWidth` survived a save), with a raw-JSON area in the View Add dialog to author them.
-- Fixed a validator bug that checked region-name uniqueness across the whole model instead of per parent, and another that accepted a reference of the wrong model type; added a `preferredWidth` (1-11) range check.
-- Region fields (Default Region, Scene Change directives) are now breadcrumb-picker combo boxes sourced from the model's own region tree, instead of free text.
-- Renaming or deleting a Region, Scene or Case now auto-rewrites every reference to it within the model (Default Region, directive regions, Prior Scene, Default Case).
-- Roles validation is now applied to Application Models.
-
-## Master Detail Model
-
-- Binding Overview Models (an Overview Model that only backs a Form Model's Available/Selected Items widget) are now excluded from the master Overview Model combo.
-- Roles validation is now applied to Master Detail Models.
-
-## Document Model
-
-- Fixed an over-strict Enumeration label validator that flagged perfectly valid unlabeled enumerations; added cross-validation for String's `noValueValidation`.
-- Added the two missing Include checks (locale coverage, single non-repeatable root group), a Supported Characters validator, and name-pattern checks for Group/Field/Rule/Computation names.
-- Base Model and Include pickers no longer offer candidates that would create an include loop.
-- Document Uniqueness Criteria (the content-level, path-addressed uniqueness rule) now has an editor panel and a validator.
+- New editor with source and target trees, tag columns, resolution-strategy and move-field-mapping dialogs and a Clear column; kernel-backed.
 
 ## Form Model
 
-- Roles validation is now applied to Form Models.
-- Added validators for Amount Suffix field references, Placeholder/Exposition conflicts, External Enumeration/Exposition conflicts, duplicate style names, and the reserved `bindingConfiguration` annotation name.
-- Label-as-Expression fields are now validated with the same expression syntax checker built for Overview expression columns.
-- Removed a stale, invalid dependent-group condition from a form fixture that Studio's own drift validator correctly flagged.
+- Preprocessing Settings panel in the Model Settings dialog.
+- D/T dependency badges on the Form Model tree and on the Document Model source tree of the editor.
+- Delete confirmation lists the references the delete cleans up.
+- Deleting a Screen that navigation buttons target now asks per button: clear the target, select another screen, or delete the button.
+- Duplicate annotation names per node are validated.
 
-## Type Definition Model
+## Document Model
 
-- A Type Definition Model can now hold local type definitions and imported ones at the same time (previously Add/Import buttons incorrectly disabled each other, even on the Type Definition Model that is meant to combine both).
-- A multi-select group's enumeration value field can no longer point at an imported or included type definition, matching SME.
-- Added blank id/name validation for type definitions.
+- `baseYear` in Model Info with `interpretationOfYear` validation.
+- `includeLevel` and `roundingMode` now round-trip.
+- Duplicate annotation names per element are validated.
 
-## Relationship Model
+## Overview Model
 
-- The entity and Link Document Model pickers now offer Combination Models, and a validator bug that treated the two references inconsistently is fixed.
-- Added role name pattern/length validation.
-- Renaming a role now also rewrites Tree Model child-relationship references (previously only Query/Form/Relationship UI/Overview Models were updated).
-- Roles validation is now applied to Relationship and Relationship UI Models.
-- Relationship labels are hidden in the add/edit dialog, matching SME's read-only behavior there.
-
-## Combined Document Model
-
-- The Base Model and Decoration pickers now offer Combination Models; the Addition step's picker is now restricted to Additive Document Models.
-- Added "Invalid Reference" validation for the base model and for additive/selection/decoration steps, reported directly on the offending step.
-- Roles validation is now applied to Combined Document Models.
+- Custom filter field picker excludes dynamic-suffix and already-used fields.
+- Numerous editor and validation refinements.
 
 ## Query Model
 
-- A Combination Model can now be picked, and resolved, as a Query Model's target.
-- Roles validation is now applied to Query Models.
+- Filter definitions are type-checked (port of SME's qmm binder/checker), golden-tested against SME snapshots.
+- Filter completion and hover documentation in the rule editor.
 
-## Print Typesetting Model
+## Application Model
 
-- Fixed a regression where Model Settings showed Name/Description fields that should be hidden for a Typesetting Model.
+- Nested subregions can be edited.
+
+## Content Model
+
+- Length/spacing keywords and units now come from a single source.
+
+## Studio
+
+- Version control: branch and unpushed commit count above the changes tree; Push button with a Force push option.
+- Annotations panel shows the source (A12 or annotation data set) of each name suggestion.
+- `CommonFieldDefinitions_Td` renamed to `CommonFieldDefinitions_TDM`; `ProductMovie_DM` defines the `Language` type inline for multi-select.
+
+## Known open items
+
+See `TODO.md`. Several of the new editors (Transformer, Structural Mapping, the Form delete dialog) have only been exercised headless, not on a display.
